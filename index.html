@@ -1468,12 +1468,8 @@
                                 textAlign: 'center',
                                 formatter: (value, context) => {
                                     const label = context.chart.data.labels[context.dataIndex];
-                                    let sum = 0;
-                                    let dataArr = context.chart.data.datasets[0].data;
-                                    dataArr.forEach(data => sum += data);
-                                    let percentage = Math.round((value / sum) * 100) + "%";
                                     let shortLabel = label.length > 15 ? label.substring(0, 15) + '...' : label;
-                                    return `${shortLabel}\n${percentage}`;
+                                    return `${shortLabel}\n${value} เคส`;
                                 },
                                 display: function(context) {
                                     let dataset = context.dataset.data;
@@ -1559,12 +1555,8 @@
                                 textAlign: 'center',
                                 formatter: (value, context) => {
                                     const label = context.chart.data.labels[context.dataIndex];
-                                    let sum = 0;
-                                    let dataArr = context.chart.data.datasets[0].data;
-                                    dataArr.forEach(data => sum += data);
-                                    let percentage = Math.round((value / sum) * 100) + "%";
                                     let shortLabel = label.length > 15 ? label.substring(0, 15) + '...' : label;
-                                    return `${shortLabel}\n${percentage}`;
+                                    return `${shortLabel}\n${value} เคส`;
                                 },
                                 display: function(context) {
                                     let dataset = context.dataset.data;
