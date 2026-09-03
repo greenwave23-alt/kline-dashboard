@@ -1,0 +1,956 @@
+# Let's save the HTML dashboard file so the user can directly open or download it,
+# and also provide clear instructions.
+dashboard_html = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K Line Logistics - Accident & Nonconformity Executive Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', 'Sarabun', sans-serif; background-color: #fcf8f8; }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .kpi-card-active { background-color: #991b1b !important; color: #ffffff !important; border-color: #7f1d1d !important; }
+        .kpi-card-active * { color: #ffffff !important; }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        @keyframes pulse-slow { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .animate-pulse-slow { animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    </style>
+</head>
+<body class="text-slate-800 font-sans">
+
+    <header class="bg-gradient-to-r from-slate-900 via-rose-950 to-slate-900 text-white shadow-md border-b-4 border-rose-600 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-rose-600 text-white font-black text-xl px-3 py-1 rounded shadow-inner tracking-wider">"K" LINE</div>
+                    <div>
+                        <h1 class="font-bold text-lg leading-tight text-white">K Line Logistics (Thailand) Ltd.</h1>
+                        <p class="text-[10px] text-rose-200">Accident & Nonconformity Executive Analytics <span class="text-[9px] text-slate-300">(ระบบวิเคราะห์สถิติอุบัติเหตุและข้อบกพร่อง)</span></p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <label class="cursor-pointer bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold py-2 px-3 rounded-lg flex items-center space-x-1.5 transition duration-200 shadow-sm">
+                        <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                        <span>Upload CSV (V16.4)</span>
+                        <input type="file" id="csvFileInput" accept=".csv" class="hidden" />
+                    </label>
+                    <button id="resetButton" class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-semibold py-2 px-3 rounded-lg flex items-center space-x-1 transition duration-200">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                        <span>Reset</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <div id="statusNotification" class="hidden bg-rose-50 border border-rose-200 text-rose-800 rounded-xl p-3 flex items-center justify-between shadow-sm">
+            <div class="flex items-center space-x-2 text-sm">
+                <i data-lucide="info" class="w-5 h-5 text-rose-600"></i>
+                <span id="notificationMessage">Dataset updated</span>
+            </div>
+            <button onclick="closeNotification()" class="text-rose-600 hover:text-rose-800"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+
+        <!-- Section 1: Executive Dropdown Filters -->
+        <section class="bg-white rounded-2xl p-4 shadow-sm border border-rose-100/60">
+            <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="sliders-horizontal" class="text-rose-600 w-4 h-4"></i>
+                    <h2 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Executive Filters</h2>
+                </div>
+                <button id="clearFiltersBtn" class="text-xs text-rose-600 hover:text-rose-800 font-bold flex items-center space-x-1">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    <span>Clear All Filters</span>
+                </button>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                <div class="bg-slate-50 p-1.5 rounded-lg border border-slate-200">
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase">Customer Name</label>
+                    <select id="filterCustomer" class="w-full text-[11px] bg-white rounded border-slate-200 p-1.5 font-medium"></select>
+                </div>
+                <div class="bg-slate-50 p-1.5 rounded-lg border border-slate-200">
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase">Subcontractor</label>
+                    <select id="filterSubcontractor" class="w-full text-[11px] bg-white rounded border-slate-200 p-1.5 font-medium"></select>
+                </div>
+                <div class="bg-slate-50 p-1.5 rounded-lg border border-slate-200">
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase">Section</label>
+                    <select id="filterSection" class="w-full text-[11px] bg-white rounded border-slate-200 p-1.5 font-medium"></select>
+                </div>
+                <div class="bg-slate-50 p-1.5 rounded-lg border border-slate-200">
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase">Type of Accident</label>
+                    <select id="filterAccidentType" class="w-full text-[11px] bg-white rounded border-slate-200 p-1.5 font-medium"></select>
+                </div>
+                <div class="bg-slate-50 p-1.5 rounded-lg border border-slate-200">
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase">Liability</label>
+                    <select id="filterLiability" class="w-full text-[11px] bg-white rounded border-slate-200 p-1.5 font-medium"></select>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Financial Breakdown Cards -->
+        <section class="bg-white rounded-2xl p-4 shadow-sm border border-rose-100/60">
+            <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="circle-dollar-sign" class="text-rose-600 w-4 h-4"></i>
+                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Financial Liability & Claim Summary</h3>
+                </div>
+                <span class="text-[10px] text-slate-400">Click any metric card to cross-filter logs</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
+                <div onclick="toggleFinancialFilter('totalClaim')" id="card_totalClaim" class="p-3 rounded-xl border border-rose-200 bg-rose-50/60 cursor-pointer hover:shadow-md transition">
+                    <span class="text-[9px] font-bold text-rose-800 uppercase block truncate">Total Claim</span>
+                    <span id="sumTotalClaim" class="text-sm font-black text-rose-700 block mt-1">฿0</span>
+                </div>
+                <div onclick="toggleFinancialFilter('claimUnderCons')" id="card_claimUnderCons" class="p-3 rounded-xl border border-amber-200 bg-amber-50/60 cursor-pointer hover:shadow-md transition">
+                    <span class="text-[9px] font-bold text-amber-800 uppercase block truncate">Claim Under Cons.</span>
+                    <span id="sumClaimUnderCons" class="text-sm font-black text-amber-700 block mt-1">฿0</span>
+                </div>
+                <div onclick="toggleFinancialFilter('kllIns')" id="card_kllIns" class="p-3 rounded-xl border border-blue-200 bg-blue-50/60 cursor-pointer hover:shadow-md transition">
+                    <span class="text-[9px] font-bold text-blue-800 uppercase block truncate">KLL's Insurance</span>
+                    <span id="sumKllIns" class="text-sm font-black text-blue-700 block mt-1">฿0</span>
+                </div>
+                <div onclick="toggleFinancialFilter('custIns')" id="card_custIns" class="p-3 rounded-xl border border-teal-200 bg-teal-50/60 cursor-pointer hover:shadow-md transition">
+                    <span class="text-[9px] font-bold text-teal-800 uppercase block truncate">Customer's Ins.</span>
+                    <span id="sumCustIns" class="text-sm font-black text-teal-700 block mt-1">฿0</span>
+                </div>
+                <div onclick="toggleFinancialFilter('subIns')" id="card_subIns" class="p-3 rounded-xl border border-indigo-200 bg-indigo-50/60 cursor-pointer hover:shadow-md transition">
+                    <span class="text-[9px] font-bold text-indigo-800 uppercase block truncate">Sub's Insurance</span>
+                    <span id="sumSubIns" class="text-sm font-black text-indigo-700 block mt-1">฿0</span>
+                </div>
+                <div onclick="toggleFinancialFilter('fineCust')" id="card_fineCust" class="p-3 rounded-xl border border-purple-200 bg-purple-50/60 cursor-pointer hover:shadow-md transition">
+                    <span class="text-[9px] font-bold text-purple-800 uppercase block truncate">Fine by Cust.</span>
+                    <span id="sumFineCust" class="text-sm font-black text-purple-700 block mt-1">฿0</span>
+                </div>
+                <div onclick="toggleFinancialFilter('fineKll')" id="card_fineKll" class="p-3 rounded-xl border border-rose-300 bg-rose-100/70 cursor-pointer hover:shadow-md transition">
+                    <span class="text-[9px] font-bold text-rose-900 uppercase block truncate">Fine by KLL</span>
+                    <span id="sumFineKll" class="text-sm font-black text-rose-800 block mt-1">฿0</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Monthly Influx Trend (Based on 1st QB Received) + SLA Overview -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- 1st QB Received Monthly Trend Chart -->
+            <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-sm border border-rose-100/60 flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2">
+                    <div>
+                        <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center">
+                            <i data-lucide="trending-up" class="w-4 h-4 mr-1.5 text-rose-600"></i>
+                            Monthly Intake Trend (Based on 1st QB Received Date)
+                        </h3>
+                        <p class="text-[10px] text-slate-400">Chronological distribution of cases from initial receipt by QB Department (Click bar to filter)</p>
+                    </div>
+                    <div id="activeMonthFilterBadge" class="hidden text-[10px] font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-full flex items-center">
+                        <span id="activeMonthLabel">Month</span>
+                        <button onclick="clearMonthCohortFilter()" class="ml-1 text-rose-900 hover:text-rose-600">&times;</button>
+                    </div>
+                </div>
+                <div class="relative w-full h-56">
+                    <canvas id="qbMonthlyTrendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Operational SLA & Pipeline Readiness -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-rose-100/60 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center mb-1">
+                        <i data-lucide="timer" class="w-4 h-4 mr-1.5 text-amber-500"></i>
+                        Stage 2 Investigation SLA Monitor
+                    </h3>
+                    <p class="text-[10px] text-slate-400 mb-3">Benchmark: 7 calendar days to advance from 1st QB receipt to Second Report</p>
+                </div>
+                <div class="space-y-3">
+                    <div class="p-3 bg-amber-50/70 border border-amber-200 rounded-xl flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] font-bold text-amber-900 block">Pending Second Report (Active)</span>
+                            <span class="text-[9px] text-amber-700">Currently awaiting root cause investigation</span>
+                        </div>
+                        <span id="slaPendingCount" class="text-xl font-black text-amber-800">0</span>
+                    </div>
+                    <div class="p-3 bg-rose-50/80 border border-rose-200 rounded-xl flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] font-bold text-rose-900 block">Overdue Cases (>7 Days)</span>
+                            <span class="text-[9px] text-rose-700">Elapsed beyond 7-day target window</span>
+                        </div>
+                        <span id="slaOverdueCount" class="text-xl font-black text-rose-700">0</span>
+                    </div>
+                    <div class="p-3 bg-emerald-50/70 border border-emerald-200 rounded-xl flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] font-bold text-emerald-900 block">Advanced / Completed</span>
+                            <span class="text-[9px] text-emerald-700">Achieved Second, Third, or Final</span>
+                        </div>
+                        <span id="slaCompletedCount" class="text-xl font-black text-emerald-800">0</span>
+                    </div>
+                </div>
+                <div class="text-[9px] text-slate-400 mt-2 text-center">Auto-calculated using system calendar</div>
+            </div>
+        </section>
+
+        <!-- Section 4: Categorical Doughnut Charts -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-rose-100/60 flex flex-col">
+                <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center">
+                    <i data-lucide="pie-chart" class="w-4 h-4 mr-1.5 text-rose-600"></i>
+                    Incident Breakdown by Accident Type
+                </h3>
+                <div class="relative w-full flex-grow h-60 flex items-center justify-center">
+                    <canvas id="accidentTypePieChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-rose-100/60 flex flex-col">
+                <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center">
+                    <i data-lucide="pie-chart" class="w-4 h-4 mr-1.5 text-slate-600"></i>
+                    Department & Section Allocation
+                </h3>
+                <div class="relative w-full flex-grow h-60 flex items-center justify-center">
+                    <canvas id="sectionPieChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Consolidated Cases Log with SLA Days Remaining Column -->
+        <section class="bg-white rounded-2xl shadow-sm border border-rose-100/60 overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="table" class="w-4 h-4 text-rose-600"></i>
+                    <h2 class="text-xs font-black text-slate-800 uppercase tracking-wider">Consolidated Cases Log</h2>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="relative">
+                        <input type="text" id="tableSearch" placeholder="Search case ID, customer, section..." class="text-xs rounded-lg border-slate-200 bg-slate-50 pl-8 pr-3 py-1.5 w-60 focus:bg-white focus:ring-1 focus:ring-rose-500">
+                        <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2"></i>
+                    </div>
+                    <button id="exportCsvBtn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-1.5 px-3 rounded-lg flex items-center space-x-1">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                        <span>Export CSV</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full text-left border-collapse table-auto">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-100 text-slate-400 text-[9px] uppercase tracking-wider font-extrabold">
+                            <th class="py-2.5 px-2 text-center">Action</th>
+                            <th class="py-2.5 px-2">Report No.</th>
+                            <th class="py-2.5 px-2">Customer Name</th>
+                            <th class="py-2.5 px-2 text-rose-700">Occurrence Date</th>
+                            <th class="py-2.5 px-2 text-blue-800 bg-blue-50/40">1st QB Received</th>
+                            <th class="py-2.5 px-2 text-center">Status</th>
+                            <th class="py-2.5 px-2 text-center text-amber-700 bg-amber-50/50">SLA: Days to 2nd Report</th>
+                            <th class="py-2.5 px-2">Subcontractor</th>
+                            <th class="py-2.5 px-2 text-center">Severity</th>
+                            <th class="py-2.5 px-2 text-right">Job Financials</th>
+                            <th class="py-2.5 px-2 text-right">Claims & Fines</th>
+                            <th class="py-2.5 px-2">Note</th>
+                        </tr>
+                    </thead>
+                    <tbody id="casesTableBody" class="text-xs divide-y divide-slate-100 text-slate-600"></tbody>
+                </table>
+            </div>
+
+            <div class="px-5 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                <div id="tableRecordCount">Showing 0 matching cases</div>
+                <div class="flex space-x-1" id="paginationControls"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Case Detail Profile Modal -->
+    <div id="detailModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-slate-50 rounded-2xl shadow-xl border border-slate-200 max-w-4xl w-full overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center space-x-2">
+                    <span class="bg-rose-600 text-[10px] font-bold px-2 py-0.5 rounded">Case Profile</span>
+                    <h3 class="text-base font-extrabold" id="modalReportNo">-</h3>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-6 space-y-4 overflow-y-auto custom-scrollbar flex-grow bg-white">
+                <div id="modalSummaryGrid" class="bg-slate-50 border border-slate-200 rounded-xl p-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <span class="text-[9px] text-slate-400 font-bold uppercase block">Customer Name</span>
+                        <span class="text-xs font-bold text-slate-800" id="summaryCustomer">-</span>
+                    </div>
+                    <div>
+                        <span class="text-[9px] text-slate-400 font-bold uppercase block">1st QB Received Date</span>
+                        <span class="text-xs font-bold text-blue-700" id="summaryQbDate">-</span>
+                    </div>
+                    <div>
+                        <span class="text-[9px] text-slate-400 font-bold uppercase block">Status</span>
+                        <span class="text-xs font-bold text-slate-800" id="summaryStatus">-</span>
+                    </div>
+                    <div>
+                        <span class="text-[9px] text-slate-400 font-bold uppercase block">SLA Target Evaluation</span>
+                        <span class="text-xs font-bold" id="summarySlaStatus">-</span>
+                    </div>
+                </div>
+                <div id="modalTimelineContainer" class="space-y-3"></div>
+            </div>
+            <div class="bg-slate-100 px-6 py-3 flex justify-end items-center border-t border-slate-200">
+                <button onclick="closeModal()" class="bg-slate-800 text-white text-xs font-bold py-2 px-5 rounded-lg">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DEFAULT_DATASET = [
+            {
+                "Report No.": "BKKTR25003",
+                "Customer Name / Sub name": "Nissei Electric (Thailand) Co. Ltd.",
+                "Date of occurrence of accident / nonconformity": "09/10/2025",
+                "1st or Innitial report QB Received date": "12/10/2025",
+                "Progress date": "18/10/2025",
+                "Occurrence area (base)": "Phanat Nikhom District, Chonburi",
+                "Section": "Sea Import C/S",
+                "Liability": "OWN・OTHERS",
+                "Type of accident": "Truck accident",
+                "Incident Severity Level": "High",
+                "Sub contract name": "Thammachat Transport Co., Ltd.",
+                "Total claim": "226356",
+                "Claim under consideration ": "0",
+                "KLL's insurance ": "226356",
+                "Customer's insurance ": "0",
+                "Sub's insurance ": "0",
+                "Fine by KLL": "0",
+                "Fine by customer": "0",
+                "REVENUE": "18500",
+                "COST": "12000",
+                "TRANSPORTATION": "6000",
+                "PROFIT": "6500",
+                "Note": "Driver negotiated settlement",
+                "First Report": "Truck lost control and fell into the road median.",
+                "Second Report": "Root cause: fatigue and poor visibility at night."
+            },
+            {
+                "Report No.": "BKKTR26001",
+                "Customer Name / Sub name": "Canon Hi-Tech (Thailand) Ltd.",
+                "Date of occurrence of accident / nonconformity": "15/01/2026",
+                "1st or Innitial report QB Received date": "16/01/2026",
+                "Progress date": "20/01/2026",
+                "Occurrence area (base)": "Ayutthaya Hi-Tech Estate",
+                "Section": "Air Export C/S",
+                "Liability": "OWN",
+                "Type of accident": "Cargo damage",
+                "Incident Severity Level": "Medium",
+                "Sub contract name": "Express Carrier Service",
+                "Total claim": "45000",
+                "Claim under consideration ": "45000",
+                "KLL's insurance ": "0",
+                "Customer's insurance ": "0",
+                "Sub's insurance ": "0",
+                "Fine by KLL": "5000",
+                "Fine by customer": "0",
+                "REVENUE": "12000",
+                "COST": "8000",
+                "TRANSPORTATION": "3500",
+                "PROFIT": "4000",
+                "Note": "Pending survey review",
+                "First Report": "Pallet collapsed during forklift unloading.",
+                "Second Report": "Defective pallet strapping."
+            },
+            {
+                "Report No.": "BKKTR26015",
+                "Customer Name / Sub name": "Sony Technology (Thailand) Co. Ltd.",
+                "Date of occurrence of accident / nonconformity": "26/08/2026",
+                "1st or Innitial report QB Received date": "28/08/2026",
+                "Progress date": "",
+                "Occurrence area (base)": "Chonburi Logistics Hub",
+                "Section": "Sea Export",
+                "Liability": "OTHERS",
+                "Type of accident": "Delay in delivery",
+                "Incident Severity Level": "Low",
+                "Sub contract name": "Rapid Transit Lines",
+                "Total claim": "12000",
+                "Claim under consideration ": "12000",
+                "KLL's insurance ": "0",
+                "Customer's insurance ": "0",
+                "Sub's insurance ": "0",
+                "Fine by KLL": "0",
+                "Fine by customer": "2000",
+                "REVENUE": "8000",
+                "COST": "5000",
+                "TRANSPORTATION": "2000",
+                "PROFIT": "3000",
+                "Note": "Traffic congestion near port gate",
+                "First Report": "Container delayed at terminal gate 3."
+            }
+        ];
+
+        let rawRows = [...DEFAULT_DATASET];
+        let consolidatedCases = [];
+        let filteredCases = [];
+        let currentPage = 1;
+        const itemsPerPage = 6;
+        let selectedFinancialFilter = null;
+        let selectedMonthCohort = null;
+        let qbTrendChartInstance = null;
+        let accidentChartInstance = null;
+        let sectionChartInstance = null;
+
+        const stagesConfig = {
+            'First': ['First Report', 'First', 'First stage', 'Progress Status 1'],
+            'Second': ['Second Report', 'Second', 'The Progress Report', 'Progress Status 2'],
+            'Third': ['Third Report', 'Third', 'Progress Status 3'],
+            'Final': ['Final Report', 'Final', 'Close', 'Closed', 'Progress Status 4']
+        };
+
+        Chart.register(ChartDataLabels);
+
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            processData(rawRows);
+
+            document.getElementById('csvFileInput').addEventListener('change', handleUpload);
+            document.getElementById('resetButton').addEventListener('click', () => {
+                rawRows = [...DEFAULT_DATASET];
+                clearAllFilters();
+                processData(rawRows);
+            });
+
+            ['filterCustomer', 'filterSubcontractor', 'filterSection', 'filterAccidentType', 'filterLiability'].forEach(id => {
+                document.getElementById(id).addEventListener('change', () => {
+                    currentPage = 1;
+                    applyFiltersAndRender();
+                });
+            });
+
+            document.getElementById('tableSearch').addEventListener('input', () => {
+                currentPage = 1;
+                applyFiltersAndRender();
+            });
+
+            document.getElementById('clearFiltersBtn').addEventListener('click', clearAllFilters);
+            document.getElementById('exportCsvBtn').addEventListener('click', exportToCsv);
+        });
+
+        function parseTimestamp(dateStr) {
+            if (!dateStr) return 0;
+            const clean = String(dateStr).trim();
+            const parts = clean.split(/[\/\-\.]/);
+            if (parts.length === 3) {
+                const day = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10) - 1;
+                let year = parseInt(parts[2], 10);
+                if (year < 100) year += 2000;
+                const d = new Date(year, month, day);
+                if (!isNaN(d.getTime())) return d.getTime();
+            }
+            const d = new Date(clean);
+            return isNaN(d.getTime()) ? 0 : d.getTime();
+        }
+
+        function extractYearMonth(dateStr) {
+            const ts = parseTimestamp(dateStr);
+            if (!ts) return null;
+            const d = new Date(ts);
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        }
+
+        function getRowValue(row, possibleKeys) {
+            if (!row) return '';
+            for (const key of possibleKeys) {
+                if (row[key] !== undefined && row[key] !== null) return String(row[key]).trim();
+                const cleanKey = key.toLowerCase().replace(/[\s\._]/g, '');
+                const found = Object.keys(row).find(k => k.toLowerCase().replace(/[\s\._]/g, '') === cleanKey);
+                if (found && row[found] !== undefined && row[found] !== null) return String(row[found]).trim();
+            }
+            return '';
+        }
+
+        function parseCurrency(val) {
+            if (!val) return 0;
+            const num = parseFloat(String(val).replace(/[^0-9.-]+/g, ''));
+            return isNaN(num) ? 0 : num;
+        }
+
+        function formatCurrency(val) {
+            return '฿' + Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        }
+
+        function handleUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                transformHeader: h => h.replace(/^\uFEFF/, '').trim(),
+                complete: res => {
+                    if (res.data && res.data.length > 0) {
+                        rawRows = res.data;
+                        clearAllFilters();
+                        processData(rawRows, file.name);
+                    }
+                    e.target.value = '';
+                }
+            });
+        }
+
+        function processData(data, filename = '') {
+            const map = {};
+            data.forEach(r => {
+                const reportNo = getRowValue(r, ['Report No.', 'ReportNo']);
+                if (!reportNo) return;
+                if (!map[reportNo]) {
+                    map[reportNo] = {
+                        reportNo: reportNo,
+                        customerName: getRowValue(r, ['Customer Name / Sub name', 'Customer Name']),
+                        dateOfOccurrence: getRowValue(r, ['Date of occurrence of accident / nonconformity', 'Occurrence Date']),
+                        qbReceivedDate: getRowValue(r, ['1st or Innitial report QB Received date', '1st QB Received Date']),
+                        progressDate: getRowValue(r, ['Progress date', 'Report issue date']),
+                        base: getRowValue(r, ['Occurrence area (base)', 'Base']),
+                        section: getRowValue(r, ['Section', 'Dept']),
+                        typeOfAccident: getRowValue(r, ['Type of accident', 'Accident Type']),
+                        severity: getRowValue(r, ['Incident Severity Level', 'Severity']) || 'Medium',
+                        liability: getRowValue(r, ['Liability']),
+                        subContractName: getRowValue(r, ['Sub contract name', 'Subcontractor']),
+                        note: getRowValue(r, ['Note', 'Remark', 'หมายเหตุ']),
+                        totalClaim: parseCurrency(getRowValue(r, ['Total claim'])),
+                        claimUnderCons: parseCurrency(getRowValue(r, ['Claim under consideration'])),
+                        kllIns: parseCurrency(getRowValue(r, ["KLL's insurance"])),
+                        custIns: parseCurrency(getRowValue(r, ["Customer's insurance"])),
+                        subIns: parseCurrency(getRowValue(r, ["Sub's insurance"])),
+                        fineKll: parseCurrency(getRowValue(r, ['Fine by KLL'])),
+                        fineCust: parseCurrency(getRowValue(r, ['Fine by customer'])),
+                        revenue: parseCurrency(getRowValue(r, ['REVENUE'])),
+                        cost: parseCurrency(getRowValue(r, ['COST'])),
+                        transportation: parseCurrency(getRowValue(r, ['TRANSPORTATION'])),
+                        profit: parseCurrency(getRowValue(r, ['PROFIT'])),
+                        stages: []
+                    };
+                }
+
+                const c = map[reportNo];
+                ['First', 'Second', 'Third', 'Final'].forEach(stage => {
+                    const text = getRowValue(r, stagesConfig[stage]);
+                    if (text) {
+                        c.stages.push({ stage: stage, text: text, date: c.progressDate });
+                    }
+                });
+            });
+
+            const SYSTEM_TODAY = new Date(2026, 8, 3).getTime();
+            const SLA_LIMIT_DAYS = 7;
+
+            consolidatedCases = Object.values(map).map(c => {
+                const stageNames = c.stages.map(s => s.stage.toLowerCase());
+                c.hasSecondStage = stageNames.includes('second') || stageNames.includes('third') || stageNames.includes('final');
+                c.latestStatus = c.stages.length > 0 ? c.stages[c.stages.length - 1].stage : 'First';
+                c.qbMonth = extractYearMonth(c.qbReceivedDate) || 'Unknown';
+
+                const qbTs = parseTimestamp(c.qbReceivedDate);
+                if (qbTs) {
+                    const diffDays = Math.floor((SYSTEM_TODAY - qbTs) / (1000 * 60 * 60 * 24));
+                    c.daysSinceQb = Math.max(0, diffDays);
+                    c.daysRemainingToSecond = SLA_LIMIT_DAYS - c.daysSinceQb;
+                } else {
+                    c.daysSinceQb = null;
+                    c.daysRemainingToSecond = null;
+                }
+
+                return c;
+            });
+
+            consolidatedCases.sort((a, b) => parseTimestamp(b.qbReceivedDate) - parseTimestamp(a.qbReceivedDate));
+
+            populateDropdowns();
+            applyFiltersAndRender();
+            if (filename) showNotification(`Loaded dataset: ${filename}`);
+        }
+
+        function populateDropdowns() {
+            const customers = new Set(), subs = new Set(), secs = new Set(), types = new Set(), lias = new Set();
+            consolidatedCases.forEach(c => {
+                if (c.customerName) customers.add(c.customerName);
+                if (c.subContractName) subs.add(c.subContractName);
+                if (c.section) secs.add(c.section);
+                if (c.typeOfAccident) types.add(c.typeOfAccident);
+                if (c.liability) lias.add(c.liability);
+            });
+            buildOptions('filterCustomer', customers);
+            buildOptions('filterSubcontractor', subs);
+            buildOptions('filterSection', secs);
+            buildOptions('filterAccidentType', types);
+            buildOptions('filterLiability', lias);
+        }
+
+        function buildOptions(id, set) {
+            const el = document.getElementById(id);
+            el.innerHTML = '<option value="">All (ทั้งหมด)</option>';
+            Array.from(set).sort().forEach(v => el.innerHTML += `<option value="${v}">${v}</option>`);
+        }
+
+        function matchesFilter(c) {
+            const fCust = document.getElementById('filterCustomer').value;
+            const fSub = document.getElementById('filterSubcontractor').value;
+            const fSec = document.getElementById('filterSection').value;
+            const fType = document.getElementById('filterAccidentType').value;
+            const fLia = document.getElementById('filterLiability').value;
+            const s = document.getElementById('tableSearch').value.toLowerCase();
+
+            if (fCust && c.customerName !== fCust) return false;
+            if (fSub && c.subContractName !== fSub) return false;
+            if (fSec && c.section !== fSec) return false;
+            if (fType && c.typeOfAccident !== fType) return false;
+            if (fLia && !c.liability.includes(fLia)) return false;
+            if (selectedMonthCohort && c.qbMonth !== selectedMonthCohort) return false;
+
+            if (selectedFinancialFilter) {
+                if (selectedFinancialFilter === 'totalClaim' && c.totalClaim <= 0) return false;
+                if (selectedFinancialFilter === 'claimUnderCons' && c.claimUnderCons <= 0) return false;
+                if (selectedFinancialFilter === 'kllIns' && c.kllIns <= 0) return false;
+                if (selectedFinancialFilter === 'custIns' && c.custIns <= 0) return false;
+                if (selectedFinancialFilter === 'subIns' && c.subIns <= 0) return false;
+                if (selectedFinancialFilter === 'fineCust' && c.fineCust <= 0) return false;
+                if (selectedFinancialFilter === 'fineKll' && c.fineKll <= 0) return false;
+            }
+
+            if (s && !c.reportNo.toLowerCase().includes(s) && !c.customerName.toLowerCase().includes(s) && !c.section.toLowerCase().includes(s)) return false;
+            return true;
+        }
+
+        function applyFiltersAndRender() {
+            filteredCases = consolidatedCases.filter(matchesFilter);
+            renderFinancialCards();
+            renderSlaMonitor();
+            renderMonthlyTrendChart();
+            renderCategoricalCharts();
+            renderTable();
+        }
+
+        function renderFinancialCards() {
+            let tot = 0, under = 0, kll = 0, cust = 0, sub = 0, fCust = 0, fKll = 0;
+            filteredCases.forEach(c => {
+                tot += c.totalClaim;
+                under += c.claimUnderCons;
+                kll += c.kllIns;
+                cust += c.custIns;
+                sub += c.subIns;
+                fCust += c.fineCust;
+                fKll += c.fineKll;
+            });
+            document.getElementById('sumTotalClaim').innerText = formatCurrency(tot);
+            document.getElementById('sumClaimUnderCons').innerText = formatCurrency(under);
+            document.getElementById('sumKllIns').innerText = formatCurrency(kll);
+            document.getElementById('sumCustIns').innerText = formatCurrency(cust);
+            document.getElementById('sumSubIns').innerText = formatCurrency(sub);
+            document.getElementById('sumFineCust').innerText = formatCurrency(fCust);
+            document.getElementById('sumFineKll').innerText = formatCurrency(fKll);
+        }
+
+        function renderSlaMonitor() {
+            let pending = 0, overdue = 0, completed = 0;
+            filteredCases.forEach(c => {
+                if (c.hasSecondStage) {
+                    completed++;
+                } else {
+                    pending++;
+                    if (c.daysRemainingToSecond !== null && c.daysRemainingToSecond < 0) {
+                        overdue++;
+                    }
+                }
+            });
+            document.getElementById('slaPendingCount').innerText = pending;
+            document.getElementById('slaOverdueCount').innerText = overdue;
+            document.getElementById('slaCompletedCount').innerText = completed;
+        }
+
+        function renderMonthlyTrendChart() {
+            const monthMap = {};
+            consolidatedCases.forEach(c => {
+                if (c.qbMonth && c.qbMonth !== 'Unknown') {
+                    monthMap[c.qbMonth] = (monthMap[c.qbMonth] || 0) + 1;
+                }
+            });
+
+            const sortedMonths = Object.keys(monthMap).sort();
+            const counts = sortedMonths.map(m => monthMap[m]);
+
+            if (qbTrendChartInstance) qbTrendChartInstance.destroy();
+
+            const ctx = document.getElementById('qbMonthlyTrendChart').getContext('2d');
+            qbTrendChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedMonths,
+                    datasets: [{
+                        label: 'Cases Received (by 1st QB)',
+                        data: counts,
+                        backgroundColor: sortedMonths.map(m => m === selectedMonthCohort ? '#e11d48' : '#fda4af'),
+                        borderColor: '#e11d48',
+                        borderWidth: 1.5,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (e, items) => {
+                        if (items.length > 0) {
+                            const idx = items[0].index;
+                            const month = sortedMonths[idx];
+                            selectedMonthCohort = (selectedMonthCohort === month) ? null : month;
+                            updateCohortBadge();
+                            applyFiltersAndRender();
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            color: '#881337',
+                            anchor: 'end',
+                            align: 'top',
+                            font: { size: 10, weight: 'bold' },
+                            formatter: val => val > 0 ? val : ''
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0 } },
+                        x: { grid: { display: false } }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
+
+        function updateCohortBadge() {
+            const badge = document.getElementById('activeMonthFilterBadge');
+            if (selectedMonthCohort) {
+                document.getElementById('activeMonthLabel').innerText = `Filtered: ${selectedMonthCohort}`;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function clearMonthCohortFilter() {
+            selectedMonthCohort = null;
+            updateCohortBadge();
+            applyFiltersAndRender();
+        }
+
+        function renderCategoricalCharts() {
+            const accMap = {}, secMap = {};
+            filteredCases.forEach(c => {
+                accMap[c.typeOfAccident || 'Other'] = (accMap[c.typeOfAccident || 'Other'] || 0) + 1;
+                secMap[c.section || 'Other'] = (secMap[c.section || 'Other'] || 0) + 1;
+            });
+
+            const palette = ['#f43f5e', '#fb7185', '#fda4af', '#cbd5e1', '#94a3b8', '#64748b'];
+
+            if (accidentChartInstance) accidentChartInstance.destroy();
+            accidentChartInstance = new Chart(document.getElementById('accidentTypePieChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(accMap),
+                    datasets: [{ data: Object.values(accMap), backgroundColor: palette }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } },
+                        datalabels: { color: '#ffffff', font: { weight: 'bold', size: 10 } }
+                    },
+                    cutout: '50%'
+                }
+            });
+
+            if (sectionChartInstance) sectionChartInstance.destroy();
+            sectionChartInstance = new Chart(document.getElementById('sectionPieChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(secMap),
+                    datasets: [{ data: Object.values(secMap), backgroundColor: palette.slice().reverse() }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } },
+                        datalabels: { color: '#ffffff', font: { weight: 'bold', size: 10 } }
+                    },
+                    cutout: '50%'
+                }
+            });
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('casesTableBody');
+            tbody.innerHTML = '';
+            const total = filteredCases.length;
+            if (total === 0) {
+                tbody.innerHTML = `<tr><td colspan="12" class="text-center py-6 text-slate-400">No records found matching current criteria.</td></tr>`;
+                document.getElementById('tableRecordCount').innerText = `Showing 0 cases`;
+                return;
+            }
+
+            const start = (currentPage - 1) * itemsPerPage;
+            const paged = filteredCases.slice(start, start + itemsPerPage);
+
+            paged.forEach(c => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-rose-50/20 border-b border-slate-100 transition";
+
+                let slaBadge = '';
+                if (c.hasSecondStage) {
+                    slaBadge = `<span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-100 text-emerald-800 flex items-center justify-center space-x-1"><i data-lucide="check" class="w-3 h-3"></i><span>Achieved Stage 2</span></span>`;
+                } else if (c.daysRemainingToSecond !== null) {
+                    if (c.daysRemainingToSecond < 0) {
+                        slaBadge = `<span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-rose-100 text-rose-700 border border-rose-300 animate-pulse-slow flex items-center justify-center space-x-1"><i data-lucide="alert-circle" class="w-3 h-3"></i><span>Overdue (${Math.abs(c.daysRemainingToSecond)}d)</span></span>`;
+                    } else {
+                        slaBadge = `<span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300 flex items-center justify-center space-x-1"><i data-lucide="clock" class="w-3 h-3"></i><span>${c.daysRemainingToSecond} days left</span></span>`;
+                    }
+                } else {
+                    slaBadge = `<span class="text-[10px] text-slate-400">-</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td class="py-2 px-2 text-center">
+                        <button onclick="viewDetail('${c.reportNo}')" class="text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white px-2 py-1 rounded text-[10px] font-bold transition">View</button>
+                    </td>
+                    <td class="py-2 px-2 font-bold text-slate-700">${c.reportNo}</td>
+                    <td class="py-2 px-2"><div class="text-[10px] text-slate-800 font-semibold line-clamp-2 max-w-[130px]">${c.customerName}</div></td>
+                    <td class="py-2 px-2 text-slate-600 font-medium">${c.dateOfOccurrence}</td>
+                    <td class="py-2 px-2 text-blue-900 font-extrabold bg-blue-50/40">${c.qbReceivedDate || '-'}</td>
+                    <td class="py-2 px-2 text-center"><span class="px-2 py-0.5 rounded text-[9px] font-black uppercase bg-slate-100 text-slate-700">${c.latestStatus}</span></td>
+                    <td class="py-2 px-2 text-center">${slaBadge}</td>
+                    <td class="py-2 px-2"><div class="text-[10px] text-slate-600 line-clamp-2 max-w-[110px]">${c.subContractName || '-'}</div></td>
+                    <td class="py-2 px-2 text-center"><span class="px-1.5 py-0.5 rounded text-[9px] font-bold ${c.severity.toLowerCase().includes('high') ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-700'}">${c.severity}</span></td>
+                    <td class="py-2 px-2 text-right text-[10px]">
+                        <div class="font-bold text-slate-800">Rev: ${formatCurrency(c.revenue)}</div>
+                        <div class="${c.profit >= 0 ? 'text-emerald-700' : 'text-rose-700'} font-black">Pft: ${formatCurrency(c.profit)}</div>
+                    </td>
+                    <td class="py-2 px-2 text-right text-[10px]">
+                        <div class="font-bold text-rose-700">Claim: ${formatCurrency(c.totalClaim)}</div>
+                        ${c.fineKll > 0 ? `<div class="text-rose-900 font-black">Fine: ${formatCurrency(c.fineKll)}</div>` : ''}
+                    </td>
+                    <td class="py-2 px-2"><div class="text-[10px] text-slate-500 line-clamp-2 max-w-[120px]">${c.note || '-'}</div></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('tableRecordCount').innerText = `Showing ${start + 1} to ${Math.min(start + itemsPerPage, total)} of ${total} cases`;
+            renderPagination(Math.ceil(total / itemsPerPage));
+            lucide.createIcons();
+        }
+
+        function renderPagination(pages) {
+            const container = document.getElementById('paginationControls');
+            container.innerHTML = '';
+            if (pages <= 1) return;
+            for (let i = 1; i <= pages; i++) {
+                container.innerHTML += `<button onclick="currentPage=${i}; renderTable();" class="px-2 py-0.5 text-xs font-bold rounded ${currentPage === i ? 'bg-rose-600 text-white' : 'border hover:bg-slate-50'}">${i}</button>`;
+            }
+        }
+
+        function toggleFinancialFilter(type) {
+            selectedFinancialFilter = (selectedFinancialFilter === type) ? null : type;
+            ['totalClaim', 'claimUnderCons', 'kllIns', 'custIns', 'subIns', 'fineCust', 'fineKll'].forEach(k => {
+                const card = document.getElementById(`card_${k}`);
+                if (k === selectedFinancialFilter) card.classList.add('ring-2', 'ring-rose-500');
+                else card.classList.remove('ring-2', 'ring-rose-500');
+            });
+            applyFiltersAndRender();
+        }
+
+        function viewDetail(reportNo) {
+            const c = consolidatedCases.find(i => i.reportNo === reportNo);
+            if (!c) return;
+            document.getElementById('modalReportNo').innerText = c.reportNo;
+            document.getElementById('summaryCustomer').innerText = c.customerName;
+            document.getElementById('summaryQbDate').innerText = c.qbReceivedDate || '-';
+            document.getElementById('summaryStatus').innerText = c.latestStatus;
+
+            const slaEvaluation = c.hasSecondStage
+                ? 'Completed (Transitioned to 2nd Stage)'
+                : (c.daysRemainingToSecond < 0 ? `Overdue by ${Math.abs(c.daysRemainingToSecond)} days` : `${c.daysRemainingToSecond} calendar days left`);
+            document.getElementById('summarySlaStatus').innerText = slaEvaluation;
+
+            const timeline = document.getElementById('modalTimelineContainer');
+            timeline.innerHTML = '';
+            c.stages.forEach(s => {
+                timeline.innerHTML += `
+                    <div class="border border-slate-200 p-3 rounded-xl bg-slate-50/50">
+                        <div class="flex justify-between font-bold text-xs text-rose-700 border-b pb-1 mb-2">
+                            <span>Stage: ${s.stage}</span>
+                        </div>
+                        <p class="text-xs text-slate-700 leading-relaxed">${s.text}</p>
+                    </div>
+                `;
+            });
+
+            document.getElementById('detailModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeModal() { document.getElementById('detailModal').classList.add('hidden'); }
+
+        function clearAllFilters() {
+            document.getElementById('filterCustomer').value = '';
+            document.getElementById('filterSubcontractor').value = '';
+            document.getElementById('filterSection').value = '';
+            document.getElementById('filterAccidentType').value = '';
+            document.getElementById('filterLiability').value = '';
+            document.getElementById('tableSearch').value = '';
+            selectedFinancialFilter = null;
+            selectedMonthCohort = null;
+            updateCohortBadge();
+            applyFiltersAndRender();
+        }
+
+        function showNotification(msg) {
+            const el = document.getElementById('statusNotification');
+            document.getElementById('notificationMessage').innerText = msg;
+            el.classList.remove('hidden');
+            setTimeout(() => el.classList.add('hidden'), 4000);
+        }
+
+        function closeNotification() { document.getElementById('statusNotification').classList.add('hidden'); }
+
+        function exportToCsv() {
+            if (filteredCases.length === 0) return;
+            const rows = filteredCases.map(c => ({
+                "Report No.": c.reportNo,
+                "Customer Name": c.customerName,
+                "Occurrence Date": c.dateOfOccurrence,
+                "1st QB Received Date": c.qbReceivedDate,
+                "Latest Status": c.latestStatus,
+                "Days Elapsed Since QB": c.daysSinceQb,
+                "Days Remaining to 2nd Stage (7-day SLA)": c.daysRemainingToSecond,
+                "Subcontractor": c.subContractName,
+                "Severity": c.severity,
+                "Total Claim (THB)": c.totalClaim,
+                "Fine by KLL (THB)": c.fineKll,
+                "Note": c.note
+            }));
+            const csv = Papa.unparse(rows);
+            const blob = new Blob(["\\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "KLine_Filtered_Cases_Report.csv";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>"""
+
+with open("dashboard.html", "w", encoding="utf-8") as f:
+    f.write(dashboard_html)
+
+print("Saved dashboard.html successfully. Size:", len(dashboard_html))
