@@ -7,47 +7,19 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- Chart.js & Chart.js DataLabels plugin -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-        body {
-            font-family: 'Inter', 'Sarabun', sans-serif;
-            background-color: #f8fafc;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #f87171;
-        }
-        .kpi-card-active {
-            background-color: #334155 !important;
-            color: #ffffff !important;
-            border-color: #f87171 !important;
-            box-shadow: 0 4px 12px rgba(248, 113, 113, 0.25) !important;
-        }
-        .kpi-card-active * {
-            color: #ffffff !important;
-        }
-        
-        .line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
+        body { font-family: 'Inter', 'Sarabun', sans-serif; background-color: #f8fafc; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #f87171; }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        @keyframes pulse-slow { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .animate-pulse-slow { animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
     </style>
 </head>
 <body class="text-slate-800 font-sans">
@@ -56,30 +28,20 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center space-x-3">
-                    <div class="flex-shrink-0">
-                        <div class="bg-gradient-to-r from-rose-500 to-rose-600 text-white font-black text-xl px-3 py-1 rounded-lg tracking-wider shadow-sm">"K" LINE</div>
-                    </div>
+                    <div class="bg-gradient-to-r from-rose-500 to-rose-600 text-white font-black text-xl px-3 py-1 rounded-lg shadow-sm">"K" LINE</div>
                     <div>
                         <h1 class="font-bold text-lg leading-tight text-slate-100">K Line Logistics (Thailand) Ltd.</h1>
-                        <p class="text-[10px] text-slate-300">Accident & Nonconformity Executive Dashboard <span class="text-[9px] text-rose-300 font-medium">(แดชบอร์ดสรุปอุบัติเหตุและข้อบกพร่อง)</span></p>
+                        <p class="text-[10px] text-slate-300">Accident & Nonconformity Executive Dashboard</p>
                     </div>
                 </div>
-                
                 <div class="flex items-center space-x-3">
-                    <label class="cursor-pointer bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white text-xs font-semibold py-2 px-4 rounded-lg flex flex-col items-center transition duration-200 shadow-sm border border-rose-400/30">
-                        <div class="flex items-center space-x-2">
-                            <i data-lucide="upload-cloud" class="w-4 h-4"></i>
-                            <span>Upload New CSV</span>
-                        </div>
-                        <span class="text-[8px] font-normal text-rose-100">(อัปโหลดไฟล์ BPI accident report CSV)</span>
+                    <label class="cursor-pointer bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 text-white text-xs font-semibold py-2 px-4 rounded-lg flex flex-col items-center transition shadow-sm border border-rose-400/30">
+                        <div class="flex items-center space-x-2"><i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Upload CSV</span></div>
+                        <span class="text-[8px] font-normal text-rose-100">(V16.6 Compatible)</span>
                         <input type="file" id="csvFileInput" accept=".csv" class="hidden" />
                     </label>
-                    <button id="resetButton" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold py-2 px-3 rounded-lg flex flex-col items-center transition duration-200 border border-slate-600">
-                        <div class="flex items-center space-x-1">
-                            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                            <span>Reset Default</span>
-                        </div>
-                        <span class="text-[8px] font-normal text-slate-300">(รีเซ็ตข้อมูลเริ่มต้น)</span>
+                    <button id="resetButton" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold py-2 px-3 rounded-lg flex flex-col items-center transition border border-slate-600">
+                        <div class="flex items-center space-x-1"><i data-lucide="refresh-cw" class="w-4 h-4"></i><span>Reset</span></div>
                     </button>
                 </div>
             </div>
@@ -88,527 +50,314 @@
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-        <div id="statusNotification" class="hidden bg-rose-50 border border-rose-200 text-rose-900 rounded-xl p-3 flex items-center justify-between shadow-sm">
+        <div id="statusNotification" class="hidden bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl p-3 flex items-center justify-between shadow-sm">
             <div class="flex items-center space-x-2 text-sm">
-                <i id="notificationIcon" data-lucide="check-circle" class="w-5 h-5 text-rose-600"></i>
-                <span id="notificationMessage">Currently showing data from: <strong>Default Dataset</strong></span>
+                <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600"></i>
+                <span id="notificationMessage">Dataset updated successfully.</span>
             </div>
-            <button onclick="closeNotification()" class="text-rose-500 hover:text-rose-700">
-                <i data-lucide="x" class="w-4 h-4"></i>
-            </button>
+            <button onclick="closeNotification()" class="text-emerald-600 hover:text-emerald-800"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
 
-        <section class="bg-white rounded-2xl p-4 shadow-sm border border-rose-100/80">
-            <div class="flex items-center justify-between mb-3 pb-2 border-b border-rose-100/60">
+        <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+            <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100/60">
                 <div class="flex items-center space-x-2">
                     <i data-lucide="sliders-horizontal" class="text-rose-500 w-5 h-5"></i>
-                    <h2 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Executive Filters <span class="text-[10px] text-slate-400 font-normal ml-1">(ตัวกรองหลักข้อมูลรายงาน)</span></h2>
+                    <h2 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Executive Filters</h2>
                 </div>
-                <button id="clearFiltersBtn" class="text-xs text-rose-600 hover:text-rose-800 font-bold flex items-center space-x-1 bg-rose-50 px-2.5 py-1 rounded-md border border-rose-100 hover:bg-rose-100 transition">
-                    <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-500"></i>
-                    <span>Clear Filters <span class="text-[9px] font-normal text-slate-400">(ล้างตัวกรอง)</span></span>
+                <button id="clearFiltersBtn" class="text-xs text-rose-600 hover:text-rose-800 font-bold flex items-center space-x-1 bg-rose-50 px-2.5 py-1 rounded-md border border-rose-100 transition">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-500"></i><span>Clear All Filters</span>
                 </button>
             </div>
             
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-3">
+                <div class="bg-rose-50/80 p-1.5 rounded-lg border border-rose-200/60">
+                    <label class="block text-[10px] font-bold text-rose-800 uppercase flex items-center"><i data-lucide="target" class="w-3 h-3 mr-1"></i> Case Decision</label>
+                    <select id="filterCaseDecision" class="w-full text-[11px] bg-white rounded border-rose-300 text-rose-900 p-1.5 font-bold focus:ring-1 focus:ring-rose-500"></select>
+                </div>
                 <div class="bg-slate-50/80 p-1.5 rounded-lg border border-slate-200/60">
                     <label class="block text-[10px] font-bold text-slate-600 uppercase">Subcontractor</label>
-                    <select id="filterSubcontractor" class="w-full text-[11px] bg-white rounded-md border-slate-200 p-1.5 font-medium focus:ring-1 focus:ring-rose-500"></select>
+                    <select id="filterSubcontractor" class="w-full text-[11px] bg-white rounded border-slate-200 p-1.5 font-medium focus:ring-1 focus:ring-rose-500"></select>
                 </div>
                 <div class="bg-slate-50/80 p-1.5 rounded-lg border border-slate-200/60">
                     <label class="block text-[10px] font-bold text-slate-600 uppercase">Customer Name</label>
-                    <select id="filterCustomer" class="w-full text-[11px] bg-white rounded-md border-slate-200 p-1.5 font-medium focus:ring-1 focus:ring-rose-500"></select>
+                    <select id="filterCustomer" class="w-full text-[11px] bg-white rounded border-slate-200 p-1.5 font-medium focus:ring-1 focus:ring-rose-500"></select>
                 </div>
                 <div class="bg-slate-50/80 p-1.5 rounded-lg border border-slate-200/60">
-                    <label class="block text-[10px] font-bold text-slate-600 uppercase">Occurrence area (base)</label>
-                    <select id="filterBase" class="w-full text-[11px] bg-white rounded-md border-slate-200 p-1.5 font-medium focus:ring-1 focus:ring-rose-500"></select>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase">Occurrence Area</label>
+                    <select id="filterBase" class="w-full text-[11px] bg-white rounded border-slate-200 p-1.5 font-medium focus:ring-1 focus:ring-rose-500"></select>
                 </div>
                 <div class="bg-slate-50/80 p-1.5 rounded-lg border border-slate-200/60">
                     <label class="block text-[10px] font-bold text-slate-600 uppercase">Section</label>
-                    <select id="filterSection" class="w-full text-[11px] bg-white rounded-md border-slate-200 p-1.5 font-medium focus:ring-1 focus:ring-rose-500"></select>
+                    <select id="filterSection" class="w-full text-[11px] bg-white rounded border-slate-200 p-1.5 font-medium focus:ring-1 focus:ring-rose-500"></select>
                 </div>
                 <div class="bg-slate-50/80 p-1.5 rounded-lg border border-slate-200/60">
                     <label class="block text-[10px] font-bold text-slate-600 uppercase">Type of Accident</label>
-                    <select id="filterAccidentType" class="w-full text-[11px] bg-white rounded-md border-slate-200 p-1.5 font-medium focus:ring-1 focus:ring-rose-500"></select>
+                    <select id="filterAccidentType" class="w-full text-[11px] bg-white rounded border-slate-200 p-1.5 font-medium focus:ring-1 focus:ring-rose-500"></select>
                 </div>
                 <div class="bg-slate-50/80 p-1.5 rounded-lg border border-slate-200/60">
                     <label class="block text-[10px] font-bold text-slate-600 uppercase">Liability</label>
-                    <select id="filterLiability" class="w-full text-[11px] bg-white rounded-md border-slate-200 p-1.5 font-medium focus:ring-1 focus:ring-rose-500"></select>
+                    <select id="filterLiability" class="w-full text-[11px] bg-white rounded border-slate-200 p-1.5 font-medium focus:ring-1 focus:ring-rose-500"></select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 border-t border-slate-100/60 pt-3">
+                <div class="bg-slate-100 p-1.5 rounded-lg border border-slate-200">
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase flex items-center"><i data-lucide="calendar" class="w-3 h-3 mr-1"></i> Year (Occurrence Date)</label>
+                    <select id="filterYear" class="w-full text-[11px] bg-white rounded border-slate-300 text-slate-900 p-1.5 font-bold focus:ring-1 focus:ring-rose-500"></select>
+                </div>
+                <div class="bg-slate-100 p-1.5 rounded-lg border border-slate-200">
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase flex items-center"><i data-lucide="calendar-days" class="w-3 h-3 mr-1"></i> Month Basis</label>
+                    <select id="filterMonthBasis" class="w-full text-[11px] bg-white rounded border-slate-300 text-slate-900 p-1.5 font-bold focus:ring-1 focus:ring-rose-500">
+                        <option value="qb">1st QB Received</option>
+                        <option value="occ">Occurrence Date</option>
+                    </select>
+                </div>
+                <div class="bg-slate-100 p-1.5 rounded-lg border border-slate-200">
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase flex items-center"><i data-lucide="calendar-clock" class="w-3 h-3 mr-1"></i> Month</label>
+                    <select id="filterMonthSelect" class="w-full text-[11px] bg-white rounded border-slate-300 text-slate-900 p-1.5 font-bold focus:ring-1 focus:ring-rose-500">
+                        <option value="">All Months (เลือกทั้งหมด)</option>
+                        <option value="01">Jan (ม.ค.)</option><option value="02">Feb (ก.พ.)</option>
+                        <option value="03">Mar (มี.ค.)</option><option value="04">Apr (เม.ย.)</option>
+                        <option value="05">May (พ.ค.)</option><option value="06">Jun (มิ.ย.)</option>
+                        <option value="07">Jul (ก.ค.)</option><option value="08">Aug (ส.ค.)</option>
+                        <option value="09">Sep (ก.ย.)</option><option value="10">Oct (ต.ค.)</option>
+                        <option value="11">Nov (พ.ย.)</option><option value="12">Dec (ธ.ค.)</option>
+                    </select>
                 </div>
             </div>
         </section>
 
-        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div>
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-2">
-                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center">
-                        <i data-lucide="calendar" class="w-4 h-4 mr-1 text-slate-600"></i> Annual Case Volume Trends <span class="text-[9px] text-slate-400 font-normal ml-1">(คลิกเพื่อกรองปี)</span>
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div id="card_status_total" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                    <div>
+                        <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Filtered Cases</span>
+                        <span id="kpiTotalCases" class="block text-3xl font-black text-slate-800 mt-1">0</span>
+                    </div>
+                    <div class="p-3 bg-slate-100 text-slate-600 rounded-xl"><i data-lucide="layers" class="w-7 h-7"></i></div>
+                </div>
+                <div id="card_status_active" onclick="toggleStatusFilter('active')" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between cursor-pointer hover:border-rose-400 hover:shadow-md transition">
+                    <div>
+                        <span class="block text-[10px] font-bold text-rose-600 uppercase tracking-wider flex items-center">Open / Active <i data-lucide="mouse-pointer-click" class="w-3 h-3 ml-1 text-rose-300"></i></span>
+                        <span id="kpiOpenCases" class="block text-3xl font-black text-rose-600 mt-1">0</span>
+                    </div>
+                    <div class="p-3 bg-rose-50 text-rose-500 rounded-xl"><i data-lucide="activity" class="w-7 h-7"></i></div>
+                </div>
+                <div id="card_status_closed" onclick="toggleStatusFilter('closed')" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between cursor-pointer hover:border-emerald-400 hover:shadow-md transition">
+                    <div>
+                        <span class="block text-[10px] font-bold text-slate-600 uppercase tracking-wider flex items-center">Closed (Final) <i data-lucide="mouse-pointer-click" class="w-3 h-3 ml-1 text-slate-300"></i></span>
+                        <span id="kpiClosedCases" class="block text-3xl font-black text-slate-700 mt-1">0</span>
+                    </div>
+                    <div class="p-3 bg-slate-100 text-slate-600 rounded-xl"><i data-lucide="check-circle" class="w-7 h-7"></i></div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5 bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col justify-center">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center">
+                        <i data-lucide="alert-triangle" class="w-4 h-4 mr-1.5 text-rose-500"></i> Incident Severity Level
                     </h3>
-                    <div class="flex items-center space-x-1.5 bg-slate-50 p-1 rounded-lg border border-slate-200 shadow-sm">
-                        <span class="text-[10px] font-bold text-slate-500 px-1">Filter Month:</span>
-                        <select id="filterMonthBasis" class="text-[10px] font-bold bg-white rounded border-slate-200 py-0.5 px-1.5 focus:outline-none text-slate-700 cursor-pointer">
-                            <option value="qbReceived">1st QB Received</option>
-                            <option value="occurrence">Occurrence Date</option>
-                        </select>
-                        <select id="filterMonthSelect" class="text-[10px] font-bold bg-white rounded border-slate-200 py-0.5 px-1.5 focus:outline-none text-slate-700 cursor-pointer">
-                            <option value="">All Months (เลือกทั้งหมด)</option>
-                            <option value="01">Jan (ม.ค.)</option>
-                            <option value="02">Feb (ก.พ.)</option>
-                            <option value="03">Mar (มี.ค.)</option>
-                            <option value="04">Apr (เม.ย.)</option>
-                            <option value="05">May (พ.ค.)</option>
-                            <option value="06">Jun (มิ.ย.)</option>
-                            <option value="07">Jul (ก.ค.)</option>
-                            <option value="08">Aug (ส.ค.)</option>
-                            <option value="09">Sep (ก.ย.)</option>
-                            <option value="10">Oct (ต.ค.)</option>
-                            <option value="11">Nov (พ.ย.)</option>
-                            <option value="12">Dec (ธ.ค.)</option>
-                        </select>
+                    <span class="text-[9px] text-slate-400">(คลิกเพื่อกรอง)</span>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div id="card_sev_high" onclick="toggleSeverityFilter('High')" class="bg-rose-50 border border-rose-200 p-2.5 rounded-xl text-center cursor-pointer hover:bg-rose-100 hover:shadow-sm transition">
+                        <span class="block text-[10px] font-bold text-rose-800 uppercase">High</span>
+                        <span id="kpiSevHigh" class="block text-xl font-black text-rose-700 mt-0.5">0</span>
+                    </div>
+                    <div id="card_sev_med" onclick="toggleSeverityFilter('Medium')" class="bg-slate-50 border border-slate-200 p-2.5 rounded-xl text-center cursor-pointer hover:bg-slate-100 hover:shadow-sm transition">
+                        <span class="block text-[10px] font-bold text-slate-700 uppercase">Medium</span>
+                        <span id="kpiSevMed" class="block text-xl font-black text-slate-800 mt-0.5">0</span>
+                    </div>
+                    <div id="card_sev_low" onclick="toggleSeverityFilter('Low')" class="bg-slate-50 border border-slate-200 p-2.5 rounded-xl text-center cursor-pointer hover:bg-slate-100 hover:shadow-sm transition">
+                        <span class="block text-[10px] font-bold text-slate-600 uppercase">Low</span>
+                        <span id="kpiSevLow" class="block text-xl font-black text-slate-700 mt-0.5">0</span>
                     </div>
                 </div>
-                <div id="annualKPIContainer" class="grid grid-cols-3 gap-3"></div>
-            </div>
-            <div>
-                <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center">
-                    <i data-lucide="alert-triangle" class="w-4 h-4 mr-1 text-rose-500"></i> Incident Severity Level <span class="text-[9px] text-slate-400 font-normal ml-1">(สถิติจำแนกระดับความรุนแรง)</span>
-                </h3>
-                <div id="severityKPIContainer" class="grid grid-cols-3 gap-3"></div>
             </div>
         </section>
 
-        <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div id="totalCasesCard" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200/80 flex items-center justify-between">
-                <div>
-                    <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Filtered Cases</span>
-                    <span id="kpiTotalCases" class="block text-2xl font-black text-slate-800 mt-1">0</span>
-                </div>
-                <div class="p-2.5 bg-slate-100 text-slate-700 rounded-xl"><i data-lucide="layers" class="w-6 h-6"></i></div>
-            </div>
-            <div id="activeCasesCard" onclick="toggleStatusFilter('active')" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200/80 flex items-center justify-between cursor-pointer hover:border-rose-300 hover:shadow-md transition duration-200">
-                <div>
-                    <span class="block text-[10px] font-bold text-rose-600 uppercase tracking-wider flex items-center">
-                        Open / Active Cases <i data-lucide="mouse-pointer-click" class="w-3 h-3 ml-1 text-rose-400"></i>
-                    </span>
-                    <span id="kpiOpenCases" class="block text-2xl font-black text-rose-600 mt-1">0</span>
-                </div>
-                <div class="p-2.5 bg-rose-50 text-rose-600 rounded-xl"><i data-lucide="clock" class="w-6 h-6"></i></div>
-            </div>
-            <div id="closedCasesCard" onclick="toggleStatusFilter('closed')" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200/80 flex items-center justify-between cursor-pointer hover:border-slate-400 hover:shadow-md transition duration-200">
-                <div>
-                    <span class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider flex items-center">
-                        Closed Cases (Final) <i data-lucide="mouse-pointer-click" class="w-3 h-3 ml-1 text-slate-400"></i>
-                    </span>
-                    <span id="kpiClosedCases" class="block text-2xl font-black text-slate-700 mt-1">0</span>
-                </div>
-                <div class="p-2.5 bg-slate-100 text-slate-700 rounded-xl"><i data-lucide="check-circle" class="w-6 h-6"></i></div>
-            </div>
-        </section>
-
-        <section class="bg-white rounded-2xl p-5 shadow-sm border border-rose-100/80 space-y-4">
-            <div class="flex items-center justify-between border-b border-rose-100/60 pb-3">
+        <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+            <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
                 <div class="flex items-center space-x-2">
-                    <i data-lucide="wallet" class="text-rose-500 w-5 h-5"></i>
-                    <h2 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Financial Liability & Claim Summary <span class="text-[10px] text-slate-400 font-normal ml-1">(สรุปสถิติมูลค่าความรับผิดชอบและการเงิน - คลิกเพื่อกรอง)</span></h2>
+                    <i data-lucide="circle-dollar-sign" class="text-rose-600 w-4 h-4"></i>
+                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Financial Liability & Claim Summary</h3>
                 </div>
-                <button id="clearFinFilterBtn" onclick="toggleFinancialFilter(null)" class="hidden text-xs text-rose-600 hover:text-rose-800 font-bold flex items-center space-x-1 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
-                    <i data-lucide="filter-x" class="w-3.5 h-3.5"></i>
-                    <span>Clear Financial Filter <span class="text-[9px] font-normal text-slate-400">(ล้างตัวกรองการเงิน)</span></span>
-                </button>
             </div>
-            
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-                <div id="cardFin_totalClaim" onclick="toggleFinancialFilter('totalClaim')" class="bg-rose-50/90 border border-rose-200 p-3 rounded-xl relative overflow-hidden cursor-pointer hover:border-rose-400 hover:shadow-md transition duration-200">
-                    <span class="block text-[9px] font-bold text-rose-800 uppercase tracking-wider flex items-center justify-between">
-                        <span>Total Claim</span>
-                        <i data-lucide="filter" class="w-3 h-3 text-rose-600 hidden fin-indicator"></i>
-                    </span>
-                    <span id="finTotalClaims" class="block text-base font-black text-rose-700 mt-1">฿0.00</span>
-                    <p class="text-[8px] text-rose-500 mt-0.5 leading-tight font-medium">ความเสียหายรวมสินค้า</p>
-                    <div class="absolute right-1 bottom-1 opacity-10 text-rose-900"><i data-lucide="box" class="w-8 h-8"></i></div>
+                <div class="bg-rose-50 border border-rose-100 p-3 rounded-xl">
+                    <span class="text-[9px] font-bold text-rose-800 uppercase block truncate">Total Claim</span>
+                    <span id="finTotalClaims" class="text-sm font-black text-rose-700 block mt-1">฿0</span>
                 </div>
-
-                <div id="cardFin_underConsideration" onclick="toggleFinancialFilter('underConsideration')" class="bg-orange-50/90 border border-orange-200 p-3 rounded-xl relative overflow-hidden cursor-pointer hover:border-orange-300 hover:shadow-md transition duration-200">
-                    <span class="block text-[9px] font-bold text-orange-800 uppercase tracking-wider flex items-center justify-between">
-                        <span>Claim under cons.</span>
-                        <i data-lucide="filter" class="w-3 h-3 text-orange-600 hidden fin-indicator"></i>
-                    </span>
-                    <span id="finUnderConsideration" class="block text-base font-black text-orange-700 mt-1">฿0.00</span>
-                    <p class="text-[8px] text-orange-500 mt-0.5 leading-tight font-medium">ยอดอยู่ระหว่างพิจารณา</p>
-                    <div class="absolute right-1 bottom-1 opacity-10 text-orange-900"><i data-lucide="clock" class="w-8 h-8"></i></div>
+                <div class="bg-orange-50 border border-orange-100 p-3 rounded-xl">
+                    <span class="text-[9px] font-bold text-orange-800 uppercase block truncate">Claim Under Cons.</span>
+                    <span id="finUnderConsideration" class="text-sm font-black text-orange-700 block mt-1">฿0</span>
                 </div>
-
-                <div id="cardFin_kllInsurance" onclick="toggleFinancialFilter('kllInsurance')" class="bg-slate-100/90 border border-slate-300/80 p-3 rounded-xl relative overflow-hidden cursor-pointer hover:border-slate-400 hover:shadow-md transition duration-200">
-                    <span class="block text-[9px] font-bold text-slate-800 uppercase tracking-wider flex items-center justify-between">
-                        <span>KLL's Insurance</span>
-                        <i data-lucide="filter" class="w-3 h-3 text-slate-600 hidden fin-indicator"></i>
-                    </span>
-                    <span id="finKllInsurance" class="block text-base font-black text-slate-800 mt-1">฿0.00</span>
-                    <p class="text-[8px] text-slate-500 mt-0.5 leading-tight font-medium">ประกันชดเชยฝั่ง KLL</p>
-                    <div class="absolute right-1 bottom-1 opacity-10 text-slate-900"><i data-lucide="shield-check" class="w-8 h-8"></i></div>
+                <div class="bg-sky-50 border border-sky-100 p-3 rounded-xl">
+                    <span class="text-[9px] font-bold text-sky-800 uppercase block truncate">KLL's Insurance</span>
+                    <span id="finKllInsurance" class="text-sm font-black text-sky-700 block mt-1">฿0</span>
                 </div>
-
-                <div id="cardFin_custInsurance" onclick="toggleFinancialFilter('custInsurance')" class="bg-pink-50/80 border border-pink-200 p-3 rounded-xl relative overflow-hidden cursor-pointer hover:border-pink-300 hover:shadow-md transition duration-200">
-                    <span class="block text-[9px] font-bold text-pink-800 uppercase tracking-wider flex items-center justify-between">
-                        <span>Customer's Ins.</span>
-                        <i data-lucide="filter" class="w-3 h-3 text-pink-600 hidden fin-indicator"></i>
-                    </span>
-                    <span id="finCustInsurance" class="block text-base font-black text-pink-700 mt-1">฿0.00</span>
-                    <p class="text-[8px] text-pink-500 mt-0.5 leading-tight font-medium">ประกันชดเชยฝั่งลูกค้า</p>
-                    <div class="absolute right-1 bottom-1 opacity-10 text-pink-900"><i data-lucide="user-check" class="w-8 h-8"></i></div>
+                <div class="bg-pink-50 border border-pink-100 p-3 rounded-xl">
+                    <span class="text-[9px] font-bold text-pink-800 uppercase block truncate">Customer's Ins.</span>
+                    <span id="finCustInsurance" class="text-sm font-black text-pink-700 block mt-1">฿0</span>
                 </div>
-
-                <div id="cardFin_subInsurance" onclick="toggleFinancialFilter('subInsurance')" class="bg-zinc-100/90 border border-zinc-300/80 p-3 rounded-xl relative overflow-hidden cursor-pointer hover:border-zinc-400 hover:shadow-md transition duration-200">
-                    <span class="block text-[9px] font-bold text-zinc-800 uppercase tracking-wider flex items-center justify-between">
-                        <span>Sub's Insurance</span>
-                        <i data-lucide="filter" class="w-3 h-3 text-zinc-600 hidden fin-indicator"></i>
-                    </span>
-                    <span id="finSubInsurance" class="block text-base font-black text-zinc-800 mt-1">฿0.00</span>
-                    <p class="text-[8px] text-zinc-500 mt-0.5 leading-tight font-medium">ประกันชดเชยฝั่ง Sub</p>
-                    <div class="absolute right-1 bottom-1 opacity-10 text-zinc-900"><i data-lucide="truck" class="w-8 h-8"></i></div>
+                <div class="bg-zinc-100 border border-zinc-200 p-3 rounded-xl">
+                    <span class="text-[9px] font-bold text-zinc-800 uppercase block truncate">Sub's Insurance</span>
+                    <span id="finSubInsurance" class="text-sm font-black text-zinc-700 block mt-1">฿0</span>
                 </div>
-
-                <div id="cardFin_fineCustomer" onclick="toggleFinancialFilter('fineCustomer')" class="bg-stone-100/90 border border-stone-300 p-3 rounded-xl relative overflow-hidden cursor-pointer hover:border-stone-400 hover:shadow-md transition duration-200">
-                    <span class="block text-[9px] font-bold text-stone-800 uppercase tracking-wider flex items-center justify-between">
-                        <span>Fine by Customer</span>
-                        <i data-lucide="filter" class="w-3 h-3 text-stone-600 hidden fin-indicator"></i>
-                    </span>
-                    <span id="finFineCustomer" class="block text-base font-black text-stone-800 mt-1">฿0.00</span>
-                    <p class="text-[8px] text-stone-600 mt-0.5 leading-tight font-medium">ยอดค่าปรับเรียกเก็บลูกค้า</p>
-                    <div class="absolute right-1 bottom-1 opacity-10 text-stone-900"><i data-lucide="gavel" class="w-8 h-8"></i></div>
+                <div class="bg-stone-100 border border-stone-200 p-3 rounded-xl">
+                    <span class="text-[9px] font-bold text-stone-800 uppercase block truncate">Fine by Cust.</span>
+                    <span id="finFineCustomer" class="text-sm font-black text-stone-700 block mt-1">฿0</span>
                 </div>
+                <div class="bg-rose-100/70 border border-rose-300 p-3 rounded-xl">
+                    <span class="text-[9px] font-bold text-rose-900 uppercase block truncate">Fine by KLL</span>
+                    <span id="finFineKll" class="text-sm font-black text-rose-800 block mt-1">฿0</span>
+                </div>
+            </div>
+        </section>
 
-                <div id="cardFin_fineKll" onclick="toggleFinancialFilter('fineKll')" class="bg-rose-100/70 border border-rose-300 p-3 rounded-xl relative overflow-hidden cursor-pointer hover:border-rose-400 hover:shadow-md transition duration-200">
-                    <span class="block text-[9px] font-bold text-rose-900 uppercase tracking-wider flex items-center justify-between">
-                        <span>Fine by KLL</span>
-                        <i data-lucide="filter" class="w-3 h-3 text-rose-600 hidden fin-indicator"></i>
-                    </span>
-                    <span id="finFineKll" class="block text-base font-black text-rose-800 mt-1">฿0.00</span>
-                    <p class="text-[8px] text-rose-600 mt-0.5 leading-tight font-semibold">ส่วน KLL รับผิดชอบเอง</p>
-                    <div class="absolute right-1 bottom-1 opacity-10 text-rose-950"><i data-lucide="shield-alert" class="w-8 h-8"></i></div>
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- SLA Monitor -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center mb-1">
+                        <i data-lucide="timer" class="w-4 h-4 mr-1.5 text-rose-500"></i> SLA Compliance Tracker
+                    </h3>
+                    <p class="text-[10px] text-slate-400 mb-3">Target: 3 Business Days to Stage 2 (Excl. Weekends) <br/><span class="text-[9px] text-rose-500 font-bold">(คลิกการ์ดเพื่อกรองข้อมูล)</span></p>
+                </div>
+                <div class="space-y-3">
+                    <div id="card_sla_on_process" onclick="toggleSlaFilter('on_process')" class="p-3 bg-sky-50 border border-sky-200 rounded-xl flex items-center justify-between cursor-pointer hover:bg-sky-100 hover:shadow-sm transition">
+                        <div>
+                            <span class="text-[10px] font-bold text-sky-900 block">On process (Stage 2/3)</span>
+                            <span class="text-[9px] text-sky-700">In investigation pipeline</span>
+                        </div>
+                        <span id="slaPendingCount" class="text-xl font-black text-sky-800">0</span>
+                    </div>
+                    <div id="card_sla_overdue" onclick="toggleSlaFilter('overdue')" class="p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-center justify-between cursor-pointer hover:bg-rose-100 hover:shadow-sm transition">
+                        <div>
+                            <span class="text-[10px] font-bold text-rose-900 block">Overdue (>3 Biz Days)</span>
+                            <span class="text-[9px] text-rose-700">Stuck at 1st Report</span>
+                        </div>
+                        <span id="slaOverdueCount" class="text-xl font-black text-rose-700 animate-pulse-slow">0</span>
+                    </div>
+                    <div id="card_sla_completed" onclick="toggleSlaFilter('completed')" class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between cursor-pointer hover:bg-emerald-100 hover:shadow-sm transition">
+                        <div>
+                            <span class="text-[10px] font-bold text-emerald-900 block">Completed (Final)</span>
+                            <span class="text-[9px] text-emerald-700">Investigation closed</span>
+                        </div>
+                        <span id="slaCompletedCount" class="text-xl font-black text-emerald-800">0</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-slate-50/90 rounded-xl p-3 border border-slate-200/80">
-                <details class="group">
-                    <summary class="flex justify-between items-center font-bold text-xs text-slate-700 cursor-pointer hover:text-slate-900 focus:outline-none">
-                        <span class="flex items-center space-x-1.5">
-                            <i data-lucide="info" class="w-4 h-4 text-rose-500"></i>
-                            <span>Customs Broker Fines & Penalty Scenarios (แนวทางการเรียกเก็บค่าปรับสายงานพิธีการศุลกากร)</span>
-                        </span>
-                        <span class="text-[10px] text-slate-400 group-open:hidden">คลิกเพื่อดูรายละเอียดเพิ่มเติม (Click to Expand)</span>
-                        <span class="text-[10px] text-slate-400 hidden group-open:inline">ย่อข้อมูล (Collapse)</span>
-                    </summary>
-                    <div class="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs border-t border-slate-200 pt-3">
-                        <div class="bg-white p-2.5 rounded-lg border border-rose-100 shadow-sm">
-                            <h4 class="font-bold text-rose-700 flex items-center space-x-1"><i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-rose-500"></i><span>1. สำแดงพิกัด/ราคาผิด (HS Code / Valuation)</span></h4>
-                            <p class="text-slate-600 text-[11px] mt-1 leading-relaxed">กรณีตัวแทนออกของคีย์สำแดงรหัสพิกัดศุลกากร, ราคาสินค้า (FOB/CIF) หรือประเภทหน่วยผิด โทษปรับสูงสุดไม่เกิน 500,000 บาท ตาม พ.ร.บ. ศุลกากร 2560 มาตรา 202 ฐานสำแดงเท็จ</p>
-                        </div>
-                        <div class="bg-white p-2.5 rounded-lg border border-slate-200/60 shadow-sm">
-                            <h4 class="font-bold text-slate-800 flex items-center space-x-1"><i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-slate-500"></i><span>2. คืนตู้คอนเทนเนอร์ล่าช้า (Detention & Demurrage)</span></h4>
-                            <p class="text-slate-600 text-[11px] mt-1 leading-relaxed">กรณีดำเนินพิธีการเอกสารตรวจปล่อยล่าช้า ติดสี (Red Line) หรือไม่ได้รับการอนุมัติเอกสารนำเข้าทันกำหนด ทำให้ไม่สามารถลากตู้ไปส่งหรือคืนตู้เปล่าเข้าลานท่าเรือได้ทันเวลาล่วงเลยกำหนดของสายเรือ</p>
-                        </div>
-                        <div class="bg-white p-2.5 rounded-lg border border-rose-100 shadow-sm">
-                            <h4 class="font-bold text-rose-700 flex items-center space-x-1"><i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-rose-500"></i><span>3. ใบขนผิดเงื่อนไขควบคุม (Import/Export Permit Errors)</span></h4>
-                            <p class="text-slate-600 text-[11px] mt-1 leading-relaxed">การนำเข้าสินค้าควบคุมโดยไม่มีใบอนุญาตสำเร็จรูปจากหน่วยงานราชการที่เกี่ยวข้อง (เช่น มอก., สมอ., อย., กรมปศุสัตว์) ก่อนสินค้าถึงไทย นำไปสู่การระงับการปล่อยสินค้าและโดนอัตราโทษปรับตามสัญญากลาง</p>
-                        </div>
-                    </div>
-                </details>
+            <!-- Trend Chart -->
+            <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+                    <h3 id="trendChartTitle" class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center">
+                        <i data-lucide="trending-up" class="w-4 h-4 mr-1.5 text-slate-600"></i>
+                        Monthly Case Trend (QB Received)
+                    </h3>
+                </div>
+                <div class="relative w-full flex-grow min-h-[200px]">
+                    <canvas id="monthlyTrendChart"></canvas>
+                </div>
             </div>
         </section>
 
         <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col">
-                <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-sm font-bold text-slate-800 flex items-center">
-                        <i data-lucide="pie-chart" class="w-4.5 h-4.5 mr-2 text-rose-500"></i>
-                        Type of Accident Breakdown <span class="text-xs text-slate-400 font-normal ml-2">(คลิกเพื่อเปิด/ปิดการกรอง)</span>
-                    </h3>
-                </div>
-                <div class="relative w-full flex-grow h-64 md:h-72 flex items-center justify-center p-2">
+                <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center">
+                    <i data-lucide="pie-chart" class="w-4 h-4 mr-1.5 text-rose-500"></i> Incident by Type
+                </h3>
+                <div class="relative w-full h-64 flex items-center justify-center">
                     <canvas id="accidentTypePieChart"></canvas>
                 </div>
             </div>
-
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col">
-                <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-sm font-bold text-slate-800 flex items-center">
-                        <i data-lucide="pie-chart" class="w-4.5 h-4.5 mr-2 text-slate-600"></i>
-                        Department & Section Statistics <span class="text-xs text-slate-400 font-normal ml-2">(คลิกเพื่อเปิด/ปิดการกรอง)</span>
-                    </h3>
-                </div>
-                <div class="relative w-full flex-grow h-64 md:h-72 flex items-center justify-center p-2">
+                <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center">
+                    <i data-lucide="pie-chart" class="w-4 h-4 mr-1.5 text-slate-600"></i> Incident by Section
+                </h3>
+                <div class="relative w-full h-64 flex items-center justify-center">
                     <canvas id="sectionPieChart"></canvas>
                 </div>
             </div>
         </section>
 
-        <section class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-2 border-b border-slate-100 pb-2 gap-2">
-                <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center">
-                    <i data-lucide="trending-up" class="w-4.5 h-4.5 mr-2 text-rose-500"></i>
-                    Monthly Case Intake Trend <span class="text-[9px] text-slate-400 font-normal ml-2">(คลิกจุดบนกราฟเพื่อกรอง)</span>
-                </h3>
-            </div>
-            <div class="relative w-full h-48">
-                <canvas id="monthlyTrendLineChart"></canvas>
-            </div>
-        </section>
-
         <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                    <h2 class="text-sm font-extrabold text-[#1e293b] flex items-center uppercase tracking-wider">
-                        <i data-lucide="table" class="w-4.5 h-4.5 mr-2 text-rose-500"></i>
-                        Consolidated Cases Log <span class="text-xs text-slate-400 font-normal ml-2">(ตารางสรุปรายละเอียดเคสทั้งหมด)</span>
-                    </h2>
-                </div>
+            <div class="px-5 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <h2 class="text-sm font-extrabold text-[#1e293b] flex items-center uppercase">
+                    <i data-lucide="table" class="w-4.5 h-4.5 mr-2 text-rose-500"></i> Consolidated Cases Log
+                </h2>
                 <div class="flex items-center space-x-2">
                     <div class="relative">
-                        <input type="text" id="tableSearch" placeholder="Search ID, Customer, Classification..." class="text-xs rounded-lg border-slate-200 bg-slate-50 pl-8 pr-4 py-2 w-64 focus:border-rose-500 focus:bg-white focus:ring-1 focus:ring-rose-500">
-                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5"></i>
+                        <input type="text" id="tableSearch" placeholder="Search report ID, customer..." class="text-xs rounded-lg border-slate-200 bg-slate-50 pl-8 pr-3 py-1.5 w-60 focus:ring-1 focus:ring-rose-500 outline-none">
+                        <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2"></i>
                     </div>
-                    <button id="exportCsvBtn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-lg flex items-center space-x-1 border border-slate-200">
-                        <i data-lucide="download" class="w-4 h-4"></i>
-                        <span>Export CSV</span>
-                    </button>
                 </div>
             </div>
 
             <div class="overflow-x-auto custom-scrollbar">
-                <table class="w-full text-left border-collapse table-auto">
+                <table class="w-full text-left border-collapse table-auto min-w-[1200px]">
                     <thead>
                         <tr class="bg-slate-50 border-b border-slate-100 text-slate-500 text-[9px] uppercase tracking-wider font-extrabold">
-                            <th class="py-2.5 px-2 text-center">Actions</th>
                             <th class="py-2.5 px-2">Report No.</th>
-                            <th class="py-2.5 px-2">Customer Name</th>
-                            <!-- Column 1: Financial & Claim Breakdown (Claims, Fines, Insurance) -->
-                            <th class="py-2.5 px-2 text-rose-800 font-extrabold bg-rose-50/70 border-l border-rose-100">
-                                Financial & Claim Breakdown <span class="text-[8px] text-rose-500 font-normal block">(ค่าเสียหาย/ค่าปรับ/ประกัน)</span>
-                            </th>
-                            <!-- Column 2: Job Financial Performance (Revenue, Cost, Transportation, Profit) separated out -->
-                            <th class="py-2.5 px-2 text-emerald-800 font-extrabold bg-emerald-50/70 border-r border-emerald-100">
-                                Job Financial Performance <span class="text-[8px] text-emerald-600 font-normal block">(รายได้/ต้นทุน/ขนส่ง/กำไร)</span>
-                            </th>
-                            <th class="py-2.5 px-2">Occurrence Date</th>
-                            <th class="py-2.5 px-2 text-slate-800 font-black bg-slate-100/80">1st QB Received</th>
-                            <th class="py-2.5 px-2 text-center">SLA Compliance <span class="text-[8px] text-slate-400 font-normal block">(Target: 3 Days to Stage 2)</span></th>
+                            <th class="py-2.5 px-2">Customer</th>
+                            <th class="py-2.5 px-2 bg-rose-50/50 text-rose-800 border-l border-rose-100">Claim / Fine</th>
+                            <th class="py-2.5 px-2 bg-emerald-50/50 text-emerald-800 border-r border-emerald-100">Job Financials</th>
+                            <th class="py-2.5 px-2 text-slate-800 bg-slate-100/50">1st QB Date</th>
                             <th class="py-2.5 px-2">Status</th>
-                            <th class="py-2.5 px-2 text-slate-500 font-bold">Date Follow-up</th>
+                            <th class="py-2.5 px-2 text-center">SLA Compliance</th>
+                            <th class="py-2.5 px-2">Decision</th>
                             <th class="py-2.5 px-2">Section</th>
-                            <th class="py-2.5 px-2">Type of Accident</th>
-                            <th class="py-2.5 px-2">Subcontractor</th>
-                            <th class="py-2.5 px-2 text-center">Severity</th>
-                            <th class="py-2.5 px-2">Liability</th>
-                            <th class="py-2.5 px-2">Note</th>
+                            <th class="py-2.5 px-2">Type</th>
+                            <th class="py-2.5 px-2">Severity</th>
+                            <th class="py-2.5 px-2 text-slate-400 font-normal max-w-[200px]">Note</th>
                         </tr>
                     </thead>
-                    <tbody id="casesTableBody" class="text-xs divide-y divide-slate-100 text-slate-600"></tbody>
+                    <tbody id="casesTableBody" class="text-[10px] sm:text-xs divide-y divide-slate-100 text-slate-600"></tbody>
                 </table>
             </div>
 
-            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
-                <div id="tableRecordCount">Showing 0 to 0 of 0 matching cases</div>
+            <div class="px-5 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                <div id="tableRecordCount">Showing 0 matching cases</div>
                 <div class="flex space-x-1" id="paginationControls"></div>
             </div>
         </section>
-
     </main>
 
-    <div id="detailModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
-        <div class="bg-slate-50 rounded-2xl shadow-xl border border-slate-200 max-w-4xl w-full overflow-hidden flex flex-col max-h-[90vh]">
-            
-            <div class="bg-[#1e293b] text-white px-6 py-4 flex items-center justify-between flex-shrink-0 border-b border-rose-500">
-                <div>
-                    <div class="flex items-center space-x-2">
-                        <span class="bg-rose-500 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Case Profile</span>
-                        <h3 class="text-base font-extrabold" id="modalReportNo">BKKTR25003</h3>
-                    </div>
-                    <p class="text-xs text-slate-300 mt-1" id="modalCustomerName">Customer Name</p>
-                </div>
-                <div class="flex items-center space-x-3">
-                    <button onclick="exportCaseToWord()" class="text-slate-200 hover:text-white flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-700">
-                        <i data-lucide="file-text" class="w-3.5 h-3.5 text-rose-400"></i>
-                        <span>Export Word</span>
-                    </button>
-                    <button onclick="closeModal()" class="text-slate-400 hover:text-white">
-                        <i data-lucide="x" class="w-5 h-5"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="p-6 space-y-5 overflow-y-auto custom-scrollbar flex-grow bg-slate-50/30">
-                <div id="modalSummaryGrid" class="bg-white border border-slate-200 rounded-xl p-4 grid grid-cols-2 md:grid-cols-5 gap-4 shadow-sm">
-                    <div>
-                        <span class="text-[9px] text-slate-400 block font-bold uppercase">Customer Name</span>
-                        <span class="text-xs font-bold text-slate-800" id="summaryCustomer">-</span>
-                    </div>
-                    <div>
-                        <span class="text-[9px] text-slate-400 block font-bold uppercase">Total Claims</span>
-                        <span class="text-xs font-bold text-rose-600" id="summaryTotalClaims">-</span>
-                    </div>
-                    <div>
-                        <span class="text-[9px] text-slate-400 block font-bold uppercase">Fine by KLL</span>
-                        <span class="text-xs font-bold text-rose-700" id="summaryFineKll">-</span>
-                    </div>
-                    <div>
-                        <span class="text-[9px] text-slate-400 block font-bold uppercase">Fine by Customer</span>
-                        <span class="text-xs font-bold text-slate-700" id="summaryFineCustomer">-</span>
-                    </div>
-                    <div>
-                        <span class="text-[9px] text-slate-400 block font-bold uppercase">Liability</span>
-                        <span class="text-xs font-bold text-slate-800" id="summaryLiability">-</span>
-                    </div>
-                </div>
-
-                <!-- Job Financial Performance Block -->
-                <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-2">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-                        <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center">
-                            <i data-lucide="calculator" class="w-4 h-4 mr-1.5 text-rose-500"></i>
-                            Job Financial Performance (รายได้ / ต้นทุน / ค่าขนส่ง / กำไร)
-                        </h4>
-                    </div>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-                        <div class="bg-emerald-50/60 p-2.5 rounded-lg border border-emerald-100">
-                            <span class="text-[9px] text-emerald-700 block font-bold uppercase">REVENUE (รายได้)</span>
-                            <span class="text-xs font-black text-emerald-800" id="summaryRevenue">฿0.00</span>
-                        </div>
-                        <div class="bg-slate-100/70 p-2.5 rounded-lg border border-slate-200">
-                            <span class="text-[9px] text-slate-500 block font-bold uppercase">COST (ต้นทุน)</span>
-                            <span class="text-xs font-black text-slate-800" id="summaryCost">฿0.00</span>
-                        </div>
-                        <div class="bg-sky-50/60 p-2.5 rounded-lg border border-sky-100">
-                            <span class="text-[9px] text-sky-700 block font-bold uppercase">TRANSPORTATION (ค่าขนส่ง)</span>
-                            <span class="text-xs font-black text-sky-800" id="summaryTransportation">฿0.00</span>
-                        </div>
-                        <div class="bg-teal-50/60 p-2.5 rounded-lg border border-teal-100" id="summaryProfitContainer">
-                            <span class="text-[9px] text-teal-700 block font-bold uppercase">PROFIT (กำไรสุทธิ)</span>
-                            <span class="text-xs font-black text-teal-800" id="summaryProfit">฿0.00</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="space-y-4">
-                    <div class="flex items-center space-x-2 border-b border-slate-200 pb-2">
-                        <i data-lucide="git-branch" class="text-rose-500 w-5 h-5"></i>
-                        <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Case Lifecycle Timeline</h4>
-                    </div>
-                    <div id="modalTimelineContainer" class="py-2"></div>
-                </div>
-
-                <div class="space-y-3 pt-2 border-t border-slate-200">
-                    <div class="flex items-center space-x-2">
-                        <i data-lucide="wallet" class="text-rose-500 w-5 h-5"></i>
-                        <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Financial & Expense Breakdown <span class="text-[10px] text-slate-400 font-normal ml-1">(ตารางสรุปรายละเอียดค่าเสียหาย/ค่าปรับ/ประกัน/รายได้/ต้นทุน)</span></h4>
-                    </div>
-                    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead>
-                                <tr class="bg-rose-50/80 border-b border-rose-100 text-[10px] text-rose-900 font-extrabold uppercase">
-                                    <th class="py-2 px-3">Financial Item (รายการทางการเงิน)</th>
-                                    <th class="py-2 px-3 text-right">Amount (จำนวนเงิน)</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
-                                <tr class="bg-emerald-50/30 font-bold">
-                                    <td class="py-2 px-3">Revenue (รายได้บริการ - REVENUE)</td>
-                                    <td class="py-2 px-3 text-right text-emerald-800" id="modalFinRevenue">฿0.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2 px-3">Operating Cost (ต้นทุนการดำเนินงาน - COST)</td>
-                                    <td class="py-2 px-3 text-right text-slate-800" id="modalFinCost">฿0.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2 px-3">Transportation Cost (ค่าขนส่ง - TRANSPORTATION)</td>
-                                    <td class="py-2 px-3 text-right text-sky-800" id="modalFinTransport">฿0.00</td>
-                                </tr>
-                                <tr class="bg-teal-50/30 font-bold">
-                                    <td class="py-2 px-3">Net Profit (กำไร/ขาดทุนสุทธิ - PROFIT)</td>
-                                    <td class="py-2 px-3 text-right text-teal-800" id="modalFinProfit">฿0.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2 px-3">Total Claim (ความเสียหายรวมสินค้า)</td>
-                                    <td class="py-2 px-3 text-right font-extrabold text-rose-700" id="modalFinTotalClaim">฿0.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2 px-3">Claim under consideration (ยอดอยู่ระหว่างพิจารณา)</td>
-                                    <td class="py-2 px-3 text-right font-extrabold text-orange-700" id="modalFinUnderCons">฿0.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2 px-3">KLL's Insurance (ประกันชดเชยฝั่ง KLL)</td>
-                                    <td class="py-2 px-3 text-right font-extrabold text-slate-800" id="modalFinKllIns">฿0.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2 px-3">Customer's Insurance (ประกันชดเชยฝั่งลูกค้า)</td>
-                                    <td class="py-2 px-3 text-right font-extrabold text-pink-700" id="modalFinCustIns">฿0.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2 px-3">Sub's Insurance (ประกันชดเชยฝั่ง Sub)</td>
-                                    <td class="py-2 px-3 text-right font-extrabold text-zinc-800" id="modalFinSubIns">฿0.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2 px-3">Fine by Customer (ยอดค่าปรับเรียกเก็บลูกค้า)</td>
-                                    <td class="py-2 px-3 text-right font-extrabold text-stone-800" id="modalFinFineCust">฿0.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2 px-3">Fine by KLL (ส่วน KLL รับผิดชอบเอง)</td>
-                                    <td class="py-2 px-3 text-right font-extrabold text-rose-800" id="modalFinFineKll">฿0.00</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-slate-100 px-6 py-4 flex justify-between items-center border-t border-slate-200 flex-shrink-0">
-                <button onclick="exportCaseToWord()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold py-2.5 px-4 rounded-lg flex items-center space-x-1.5 shadow-sm">
-                    <i data-lucide="file-text" class="w-4 h-4 text-rose-300"></i>
-                    <span>Export to Word (ส่งออก Word)</span>
-                </button>
-                <button onclick="closeModal()" class="bg-[#1e293b] hover:bg-slate-800 text-white text-xs font-bold py-2.5 px-6 rounded-lg">
-                    Close Case Profile
-                </button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Default dataset formatted to mirror V16_3 layout with REVENUE, COST, TRANSPORTATION, PROFIT
         const DEFAULT_DATASET = [
             {
-                "Report No.": "BKKTR25003",
-                "Customer Name / Sub name": "Nissei Electric (Thailand) Co. Ltd.",
-                "Date of occurrence of accident / nonconformity": "09/10/2025",
-                "1st or Innitial report QB Received date": "01/04/2026",
-                "Report issue date": "22/10/2025",
-                "Date Follow-up": "16/10/2025, 23/10/2025, 30/10/2025",
-                "Occurrence area (base)": "Phanat Nikhom District, Chonburi",
-                "Section": "Sea Import C/S",
-                "Liability": "OWN・OTHERS",
-                "Type of accident": "Truck accident",
-                "injury": "Not Injured - ไม่บาดเจ็บ",
-                "Damage": "Damaged - เกิดความเสียหาย",
+                "Report No.": "BKKTR26001",
+                "Customer Name / Sub name": "Canon Hi-Tech (Thailand) Ltd.",
+                "1st or Innitial report QB Received date": "24/08/2026",
+                "Date of occurrence of accident / nonconformity": "20/08/2026",
+                "Progress date": "27/08/2026",
+                "Occurrence area (base)": "Ayutthaya Estate",
+                "Section": "Air Export C/S",
+                "Type of accident": "Cargo damage",
                 "Incident Severity Level": "High",
-                "Sub contract name": "Thammachat Transport Co., Ltd.",
-                "Reporter": "Phongpitak S.",
-                "Total claim": "226356",
-                "KLL's insurance": "150000",
-                "Customer's insurance": "50000",
-                "Sub's insurance": "26356",
-                "Claim under consideration": "0",
-                "Fine by KLL": "15000",
-                "Fine by customer": "5000",
-                "REVENUE": "450000",
-                "COST": "320000",
-                "TRANSPORTATION": "85000",
-                "PROFIT": "45000",
-                "Note": "Customer requested expedited cargo inspection and weekly progress update.",
-                "First": "The company hired Thammachat Transport Co., Ltd. to deliver Fluoro Polymer (480 drums) from Laem Chabang Port to Nakhon Ratchasima. On 9 October 2025 at about 2:30 AM, the truck lost control and fell into the road median due to driver negligence. As a result, all goods were damaged (leaking, broken, and contaminated) and could not be used. The total loss is USD 226,356.",
-                "Second": "Cause\nThe accident was caused by driver negligence.\nThe driver did not drive carefully and lost control of the truck.\nCorrection (Corrective Actions)\nTrain the driver on safe driving and awareness.\nCheck vehicle condition before transport.",
-                "Person Incharge": "Rucharee K. / Phongpitak S.",
-                "Third": "Insurance processed cargo survey. Damage claim documents are compiled under review.",
-                "Final": "Compensation of USD 226,356 paid in full by insurance. Corrective actions audited and completed successfully."
+                "Case Decision": "Offensive",
+                "Total claim": "45000",
+                "REVENUE": "15000",
+                "PROFIT": "-30000",
+                "First Report": "Pallet collapsed during forklift unloading.",
+                "Second Report": "Root cause: Defective strapping."
+            },
+            {
+                "Report No.": "BKKTR26002",
+                "Customer Name / Sub name": "Sony Technology",
+                "1st or Innitial report QB Received date": "01/09/2026",
+                "Date of occurrence of accident / nonconformity": "31/08/2026",
+                "Occurrence area (base)": "Chonburi Port",
+                "Section": "Sea Export",
+                "Type of accident": "Delay in delivery",
+                "Incident Severity Level": "Medium",
+                "Case Decision": "Defensive",
+                "Total claim": "0",
+                "Fine by customer": "2000",
+                "REVENUE": "8000",
+                "PROFIT": "6000",
+                "First Report": "Container delayed at terminal gate."
             }
         ];
 
@@ -616,196 +365,136 @@
         let consolidatedCases = [];
         let filteredCases = [];
         let currentPage = 1;
-        const itemsPerPage = 6;
-        let selectedYearFilter = null;
-        let selectedSeverityFilter = null; 
-        let selectedStatusFilter = null;   
-        let selectedFinancialFilter = null;
+        const itemsPerPage = 15;
+
+        // Global Variables
+        let selectedStatusFilter = null;
+        let selectedSeverityFilter = null;
+        let selectedSlaFilter = null;
+        
         let myPieChart = null;
         let mySectionPieChart = null;
-        let myTrendChart = null;
+        let trendChart = null;
 
-        const stagesConfig = {
-            'First': ['First', 'First Report', 'First stage', 'Progress Status 1'],
-            'Second': ['Second', 'Second Report', 'Second Report, The Progress Report', 'Progress Status 2'],
-            'Third': ['Third', 'Third Report', 'Third Report ', 'Progress Status 3'],
-            'Final': ['Final', 'Final Report', 'Final stage', 'Progress Status 4', 'Close', 'Closed']
-        };
+        const SYSTEM_TODAY = new Date(2026, 8, 3).getTime(); 
 
         Chart.register(ChartDataLabels);
 
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
-            processRawDataAndInit(rawRows);
-
             document.getElementById('csvFileInput').addEventListener('change', handleCsvUpload);
             document.getElementById('resetButton').addEventListener('click', () => {
                 rawRows = [...DEFAULT_DATASET];
-                selectedYearFilter = null;
-                selectedSeverityFilter = null;
-                selectedStatusFilter = null;
-                selectedFinancialFilter = null;
-                document.getElementById('filterMonthSelect').value = "";
-                document.getElementById('filterAccidentType').value = "";
-                document.getElementById('filterSubcontractor').value = "";
+                clearAllFilters(false);
                 processRawDataAndInit(rawRows);
             });
 
-            ['filterSubcontractor', 'filterCustomer', 'filterBase', 'filterSection', 'filterAccidentType', 'filterLiability', 'filterMonthBasis', 'filterMonthSelect'].forEach(id => {
+            ['filterSubcontractor', 'filterCustomer', 'filterBase', 'filterSection', 'filterAccidentType', 'filterLiability', 'filterCaseDecision', 'filterYear', 'filterMonthSelect', 'filterMonthBasis'].forEach(id => {
                 const el = document.getElementById(id);
-                if (el) el.addEventListener('change', () => { currentPage = 1; applyFiltersAndRender(); });
+                if (el) el.addEventListener('change', () => { 
+                    currentPage = 1; 
+                    applyFiltersAndRender(); 
+                });
             });
 
             document.getElementById('tableSearch').addEventListener('input', () => { currentPage = 1; applyFiltersAndRender(); });
-            document.getElementById('clearFiltersBtn').addEventListener('click', () => { 
-                selectedYearFilter = null; 
-                selectedSeverityFilter = null; 
-                selectedStatusFilter = null;
-                selectedFinancialFilter = null;
-                document.getElementById('filterMonthSelect').value = "";
-                clearAllFilters(); 
-            });
-            document.getElementById('exportCsvBtn').addEventListener('click', exportFilteredDataToCsv);
+            document.getElementById('clearFiltersBtn').addEventListener('click', () => clearAllFilters(true));
+            
+            processRawDataAndInit(rawRows);
         });
 
-        function parseCurrency(val) {
-            if (val === undefined || val === null || val === '') return 0;
-            const str = String(val).trim();
-            if (!str) return 0;
-            const isNegative = str.startsWith('-') || (str.startsWith('(') && str.endsWith(')'));
-            const clean = str.replace(/[^0-9.]/g, '');
-            const parsed = parseFloat(clean);
-            if (isNaN(parsed)) return 0;
-            return isNegative ? -parsed : parsed;
-        }
-
-        function parseDateStrToTimestamp(dateStr) {
-            if (!dateStr) return 0;
-            const str = String(dateStr).trim();
-            const parts = str.split(/[\/\-]/);
-            if (parts.length === 3) {
-                const day = parseInt(parts[0], 10);
-                const month = parseInt(parts[1], 10) - 1;
-                let year = parseInt(parts[2], 10);
-                if (year < 100) year += 2000;
-                const d = new Date(year, month, day);
-                if (!isNaN(d.getTime())) return d.getTime();
+        function getRowValue(row, possibleKeys) {
+            if (!row) return '';
+            const rowKeys = Object.keys(row);
+            for (const key of possibleKeys) {
+                if (row[key] !== undefined && row[key] !== null) return String(row[key]).trim();
+                const cleanKey = key.toLowerCase().replace(/[\s\._\-]/g, '');
+                const found = rowKeys.find(k => k.toLowerCase().replace(/[\s\._\-]/g, '') === cleanKey);
+                if (found && row[found] !== undefined && row[found] !== null) return String(row[found]).trim();
             }
-            const parsed = new Date(str);
-            return isNaN(parsed.getTime()) ? 0 : parsed.getTime();
+            return '';
         }
 
-        // New Helper: Calculate difference in days
-        function diffDays(startMs, endMs) {
-            return Math.floor((endMs - startMs) / (1000 * 60 * 60 * 24));
+        function parseCurrency(val) {
+            if (!val) return 0;
+            const parsed = parseFloat(String(val).replace(/[^0-9.-]+/g, ''));
+            return isNaN(parsed) ? 0 : parsed;
         }
 
-        // New Helper: Calculate difference in business days (excluding weekends)
-        function diffBusinessDays(startMs, endMs) {
-            if (!startMs || !endMs) return 0;
-            let start = new Date(startMs);
-            let end = new Date(endMs);
+        function formatNumber(num) {
+            return Number(num).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        }
+
+        const MONTH_LOOKUP = {
+            jan: 1, january: 1, feb: 2, february: 2, mar: 3, march: 3,
+            apr: 4, april: 4, may: 5, jun: 6, june: 6, jul: 7, july: 7,
+            aug: 8, august: 8, sep: 9, sept: 9, september: 9, oct: 10, october: 10,
+            nov: 11, november: 11, dec: 12, december: 12
+        };
+
+        function parseDateParts(dateStr) {
+            if (!dateStr) return null;
+            const str = String(dateStr).trim();
+            if (!str) return null;
+            const parts = str.split(/[\/\-]/).map(p => p.trim());
+            if (parts.length >= 3) {
+                let year, month, day;
+                if (/^\d{4}$/.test(parts[0])) {
+                    year = Number(parts[0]);
+                    month = /^\d+$/.test(parts[1]) ? Number(parts[1]) : MONTH_LOOKUP[parts[1].toLowerCase()];
+                    day = Number(parts[2]);
+                } else {
+                    day = Number(parts[0]);
+                    month = /^\d+$/.test(parts[1]) ? Number(parts[1]) : MONTH_LOOKUP[parts[1].toLowerCase()];
+                    year = Number(parts[2]);
+                    if (year < 100) year += 2000;
+                }
+                if (year && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+                    const d = new Date(year, month - 1, day);
+                    if (d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day) {
+                        return { year, month, day, timestamp: d.getTime() };
+                    }
+                }
+            }
+            const fallback = new Date(str);
+            if (!isNaN(fallback.getTime())) return { year: fallback.getFullYear(), month: fallback.getMonth()+1, day: fallback.getDate(), timestamp: fallback.getTime() };
+            return null;
+        }
+
+        function parseDateStrToTimestamp(dateStr) { const p = parseDateParts(dateStr); return p ? p.timestamp : 0; }
+        function extractMonthFromDate(dateStr) { const p = parseDateParts(dateStr); return p ? String(p.month).padStart(2, '0') : null; }
+        function extractYear(dateStr) { const p = parseDateParts(dateStr); return p ? String(p.year) : null; }
+        function getYearMonth(dateStr) { const p = parseDateParts(dateStr); return p ? `${p.year}-${String(p.month).padStart(2, '0')}` : null; }
+
+        function getBusinessDays(startTs, endTs) {
+            if (!startTs || !endTs || startTs > endTs) return 0;
+            let start = new Date(startTs);
+            let end = new Date(endTs);
             start.setHours(0,0,0,0);
             end.setHours(0,0,0,0);
-            if (start > end) return 0;
+            
             let count = 0;
             let cur = new Date(start);
             while (cur < end) {
                 cur.setDate(cur.getDate() + 1);
                 let day = cur.getDay();
-                if (day !== 0 && day !== 6) { // 0 = Sunday, 6 = Saturday
-                    count++;
-                }
+                if (day !== 0 && day !== 6) count++; 
             }
             return count;
-        }
-
-        function getRowValue(row, possibleKeys) {
-            if (!row) return '';
-            
-            for (const key of possibleKeys) {
-                if (row[key] !== undefined && row[key] !== null) return row[key].toString();
-            }
-
-            const rowKeys = Object.keys(row);
-            for (const key of possibleKeys) {
-                const cleanTarget = key.toLowerCase().replace(/[\uFEFF\s_]/g, '');
-                const foundKey = rowKeys.find(k => k.toLowerCase().replace(/[\uFEFF\s_]/g, '') === cleanTarget);
-                if (foundKey && row[foundKey] !== undefined && row[foundKey] !== null) {
-                    return row[foundKey].toString();
-                }
-            }
-            return '';
-        }
-
-        function extractYearFromDate(dateStr) {
-            if (!dateStr) return null;
-            const str = String(dateStr).trim();
-            const match = str.match(/\/(\d{4})/);
-            if (match) return match[1];
-            const matchShort = str.match(/-([a-zA-Z]{3})-(\d{4})/);
-            if (matchShort) return matchShort[2];
-            const parsedYear = new Date(str).getFullYear();
-            return isNaN(parsedYear) ? null : String(parsedYear);
-        }
-
-        function extractMonthFromDate(dateStr) {
-            if (!dateStr) return null;
-            const str = String(dateStr).trim();
-            const match = str.match(/^\d{1,2}[\/\-](\d{1,2})[\/\-]\d{4}/);
-            if (match) {
-                return match[1].padStart(2, '0');
-            }
-            const parsedDate = new Date(str);
-            if (!isNaN(parsedDate.getTime())) {
-                return String(parsedDate.getMonth() + 1).padStart(2, '0');
-            }
-            return null;
-        }
-        
-        function extractYearMonthStr(dateStr) {
-            if(!dateStr) return null;
-            const year = extractYearFromDate(dateStr);
-            const month = extractMonthFromDate(dateStr);
-            if(year && month) return `${year}-${month}`;
-            return null;
         }
 
         function handleCsvUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             Papa.parse(file, {
-                header: true,
-                skipEmptyLines: 'greedy',
-                transformHeader: function(h) {
-                    return h ? h.replace(/^\uFEFF/, '').trim() : '';
-                },
-                complete: function(results) {
-                    if (results.data && results.data.length > 0) {
-                        rawRows = results.data;
-                        
-                        selectedYearFilter = null;
-                        selectedSeverityFilter = null;
-                        selectedStatusFilter = null;
-                        selectedFinancialFilter = null;
-                        
-                        ['filterSubcontractor', 'filterCustomer', 'filterBase', 'filterSection', 'filterAccidentType', 'filterLiability', 'filterMonthSelect', 'tableSearch'].forEach(id => {
-                            const el = document.getElementById(id);
-                            if (el) el.value = "";
-                        });
-
-                        currentPage = 1;
+                header: true, skipEmptyLines: true,
+                transformHeader: h => h ? h.replace(/^\uFEFF/, '').trim() : '',
+                complete: res => {
+                    if (res.data && res.data.length > 0) {
+                        rawRows = res.data;
+                        clearAllFilters(false);
                         processRawDataAndInit(rawRows, file.name);
-                        
-                        event.target.value = '';
-                    } else {
-                        showNotification(`Warning: CSV file "${file.name}" contained no valid records.`);
-                        event.target.value = '';
                     }
-                },
-                error: function(err) {
-                    showNotification(`Error parsing CSV file: ${err.message}`);
                     event.target.value = '';
                 }
             });
@@ -813,1286 +502,452 @@
 
         function processRawDataAndInit(data, fileName = "") {
             const casesMap = {};
-            let lastSeenReportNo = '';
-            let lastSeenCustomer = '';
-            let lastSeenDate = '';
-
             data.forEach(row => {
-                let reportNo = getRowValue(row, ['Report No.', 'ReportNo', 'Report_No']).trim();
-                if (!reportNo && lastSeenReportNo) reportNo = lastSeenReportNo;
-                else if (reportNo) lastSeenReportNo = reportNo;
+                let rNo = getRowValue(row, ['Report No.', 'ReportNo', 'Report No']);
+                if (!rNo) return;
 
-                if (!reportNo) return;
-
-                let customer = getRowValue(row, ['Customer Name / Sub name', 'Customer Name', 'CustomerName', 'Customer']).trim();
-                if (!customer && lastSeenCustomer) customer = lastSeenCustomer;
-                else if (customer) lastSeenCustomer = customer;
-
-                let occurDate = getRowValue(row, ['Date of occurrence of accident / nonconformity', 'Date of occurrence', 'Occurrence Date', 'OccurrenceDate']).trim();
-                if (!occurDate && lastSeenDate) occurDate = lastSeenDate;
-                else if (occurDate) lastSeenDate = occurDate;
-
-                const totalClaimVal = parseCurrency(getRowValue(row, ['Total claim', 'TotalClaim', 'Claim Amount', 'Total claim ']));
-                const kllInsuranceVal = parseCurrency(getRowValue(row, ["KLL's insurance", "KLL insurance", "KLL's Insurance", "KLL's insurance "]));
-                const custInsuranceVal = parseCurrency(getRowValue(row, ["Customer's insurance", "Customer insurance", "Customer's Insurance", "Customer's insurance "]));
-                const subInsuranceVal = parseCurrency(getRowValue(row, ["Sub's insurance", "Sub's Insurance", "Subcontractor's insurance", "Sub's insurance "]));
-                const claimUnderConsiderationVal = parseCurrency(getRowValue(row, ['Claim under consideration', 'ClaimUnderConsideration', 'Under Consideration', 'Claim under consideration ']));
-                const fineByKllVal = parseCurrency(getRowValue(row, ['Fine by KLL', 'Fine\nby KLL', 'Fine KLL', 'Fine by KLL ']));
-                const fineByCustomerVal = parseCurrency(getRowValue(row, ['Fine by customer', 'Fine\nby customer', 'Fine Customer', 'Fine by customer ']));
-
-                const revenueVal = parseCurrency(getRowValue(row, ['REVENUE', 'Revenue', 'revenue', 'REVENUE ']));
-                const costVal = parseCurrency(getRowValue(row, ['COST', 'Cost', 'cost', 'COST ']));
-                const transportVal = parseCurrency(getRowValue(row, ['TRANSPORTATION', 'Transportation', 'transportation', 'TRANSPORTATION ']));
-                const profitVal = parseCurrency(getRowValue(row, ['PROFIT', 'Profit', 'profit', 'PROFIT ']));
-
-                if (!casesMap[reportNo]) {
-                    casesMap[reportNo] = {
-                        reportNo: reportNo,
-                        customerName: customer,
-                        dateOfOccurrence: occurDate,
-                        qbReceivedDate: '',
-                        dateFollowUp: '',
-                        base: '', section: '', typeOfAccident: '', severity: 'Medium', liability: '', subContractName: '',
-                        totalClaim: 0,
-                        kllInsurance: 0,
-                        custInsurance: 0,
-                        subInsurance: 0,
-                        claimUnderConsideration: 0,
-                        fineByKll: 0,
-                        fineByCustomer: 0,
-                        revenue: 0,
-                        cost: 0,
-                        transportation: 0,
-                        profit: 0,
-                        note: '',
-                        rawUpdates: [],
-                        secondStageDate: 0
+                if (!casesMap[rNo]) {
+                    casesMap[rNo] = {
+                        reportNo: rNo,
+                        customerName: getRowValue(row, ['Customer Name / Sub name', 'Customer Name', 'Customer']),
+                        dateOfOccurrence: getRowValue(row, ['Date of occurrence of accident / nonconformity', 'Occurrence Date']),
+                        qbReceivedDate: getRowValue(row, ['1st or Innitial report QB Received date', '1st QB Received Date']),
+                        progressDate: getRowValue(row, ['Progress date', 'Report issue date']),
+                        base: getRowValue(row, ['Occurrence area (base)', 'Occurrence Area', 'Base']),
+                        section: getRowValue(row, ['Section', 'Dept', 'Department']),
+                        typeOfAccident: getRowValue(row, ['Type of accident']),
+                        severity: getRowValue(row, ['Incident Severity Level', 'Severity']) || 'Medium',
+                        liability: getRowValue(row, ['Liability']),
+                        subContractName: getRowValue(row, ['Sub contract name', 'Subcontractor']),
+                        note: getRowValue(row, ['Note', 'หมายเหตุ', 'Remark']),
+                        caseDecision: getRowValue(row, ['Case Decision', 'Case decision', 'Decision']),
+                        totalClaim: parseCurrency(getRowValue(row, ['Total claim'])),
+                        claimUnderCons: parseCurrency(getRowValue(row, ['Claim under consideration'])),
+                        kllIns: parseCurrency(getRowValue(row, ["KLL's insurance"])),
+                        custIns: parseCurrency(getRowValue(row, ["Customer's insurance"])),
+                        subIns: parseCurrency(getRowValue(row, ["Sub's insurance"])),
+                        fineKll: parseCurrency(getRowValue(row, ['Fine by KLL'])),
+                        fineCust: parseCurrency(getRowValue(row, ['Fine by customer'])),
+                        rev: parseCurrency(getRowValue(row, ['REVENUE'])),
+                        cost: parseCurrency(getRowValue(row, ['COST'])),
+                        trans: parseCurrency(getRowValue(row, ['TRANSPORTATION'])),
+                        profit: parseCurrency(getRowValue(row, ['PROFIT'])),
+                        stagesList: []
                     };
                 }
 
-                const cCase = casesMap[reportNo];
-                const baseVal = getRowValue(row, ['Occurrence area (base)', 'Base', 'Area']);
-                const secVal = getRowValue(row, ['Section', 'Dept']);
-                const typeVal = getRowValue(row, ['Type of accident', 'Type of accident for first report', 'Accident Type']);
-                const sevVal = getRowValue(row, ['Incident Severity Level', 'Sevirity', 'Severity']);
-                const liaVal = getRowValue(row, ['Liability']);
-                const subVal = getRowValue(row, ['Sub contract name', 'Subcontract name', 'Sub contract', 'Subcontractor']);
-                const noteVal = getRowValue(row, ['Note', 'note', 'Notes', 'Remark', 'หมายเหตุ']);
+                ['First', 'Second', 'Third', 'Final'].forEach(st => {
+                    let text = getRowValue(row, [st + ' Report', st + ' Report ', st]);
+                    if (text && !casesMap[rNo].stagesList.includes(st)) {
+                        casesMap[rNo].stagesList.push(st);
+                    }
+                });
+            });
+
+            consolidatedCases = Object.values(casesMap).map(c => {
+                c.latestStatus = c.stagesList.length > 0 ? c.stagesList[c.stagesList.length - 1] : 'First';
+                c.isFinal = c.latestStatus === 'Final';
+                c.isStage2Or3 = c.latestStatus === 'Second' || c.latestStatus === 'Third';
                 
-                const qbDateVal = getRowValue(row, ['1st or Innitial report QB Received date', '1st QB Received Date', '1st QB Received']);
-                const followUpVal = getRowValue(row, ['Date Follow-up', 'Date Followup', 'Follow-up Date']);
-
-                if (baseVal) cCase.base = baseVal;
-                if (secVal) cCase.section = secVal;
-                if (typeVal) cCase.typeOfAccident = typeVal;
-                if (sevVal) cCase.severity = sevVal;
-                if (liaVal) cCase.liability = liaVal;
-                if (subVal) cCase.subContractName = subVal;
-                if (noteVal) cCase.note = noteVal;
-                if (qbDateVal) cCase.qbReceivedDate = qbDateVal;
-                if (followUpVal) cCase.dateFollowUp = followUpVal;
-
-                if (totalClaimVal > cCase.totalClaim) cCase.totalClaim = totalClaimVal;
-                if (kllInsuranceVal > cCase.kllInsurance) cCase.kllInsurance = kllInsuranceVal;
-                if (custInsuranceVal > cCase.custInsurance) cCase.custInsurance = custInsuranceVal;
-                if (subInsuranceVal > cCase.subInsurance) cCase.subInsurance = subInsuranceVal;
-                if (claimUnderConsiderationVal > cCase.claimUnderConsideration) cCase.claimUnderConsideration = claimUnderConsiderationVal;
-                if (fineByKllVal > cCase.fineByKll) cCase.fineByKll = fineByKllVal;
-                if (fineByCustomerVal > cCase.fineByCustomer) cCase.fineByCustomer = fineByCustomerVal;
-
-                if (revenueVal > cCase.revenue) cCase.revenue = revenueVal;
-                if (costVal > cCase.cost) cCase.cost = costVal;
-                if (transportVal > cCase.transportation) cCase.transportation = transportVal;
-                if (profitVal !== 0 && cCase.profit === 0) cCase.profit = profitVal;
-
-                let addedAnyStage = false;
-                const stagesList = ['First', 'Second', 'Third', 'Final'];
-                stagesList.forEach(stage => {
-                    const keysToSearch = stagesConfig[stage];
-                    const contentValue = getRowValue(row, keysToSearch).trim();
-                    if (contentValue) {
-                        const virtualRow = { ...row };
-                        virtualRow["Progress Status"] = stage;
-                        virtualRow["Details of accident"] = contentValue;
-                        // Record stage date for SLA calculation. If Progress date exists on this row, use it.
-                        virtualRow["Date"] = getRowValue(row, ['Progress date', 'Report issue date']); 
-                        cCase.rawUpdates.push(virtualRow);
-                        addedAnyStage = true;
-                    }
-                });
-
-                if (!addedAnyStage) {
-                    const statusVal = getRowValue(row, ['Progress Status', 'Progress status', 'Status', 'Stage']);
-                    const detailsVal = getRowValue(row, ['Details of accident', 'Details of classification', 'Details', 'Summary']);
-                    if (statusVal || detailsVal || Object.keys(row).length > 0) {
-                        const virtualRow = { ...row };
-                        virtualRow["Progress Status"] = statusVal || 'First';
-                        virtualRow["Details of accident"] = detailsVal || noteVal || 'Record updated';
-                        virtualRow["Date"] = getRowValue(row, ['Progress date', 'Report issue date']);
-                        cCase.rawUpdates.push(virtualRow);
+                let qbTs = parseDateStrToTimestamp(c.qbReceivedDate);
+                let progTs = parseDateStrToTimestamp(c.progressDate);
+                c.slaDaysElapsed = 0;
+                c.slaStatus = ''; 
+                
+                if (qbTs) {
+                    if (c.isFinal) {
+                        c.slaDaysElapsed = getBusinessDays(qbTs, progTs || SYSTEM_TODAY);
+                        c.slaStatus = 'completed';
+                    } else if (c.isStage2Or3) {
+                        c.slaDaysElapsed = getBusinessDays(qbTs, progTs || SYSTEM_TODAY);
+                        c.slaStatus = 'on_process';
+                    } else {
+                        let bizDays = getBusinessDays(qbTs, SYSTEM_TODAY);
+                        c.slaDaysElapsed = bizDays;
+                        if (bizDays > 3) c.slaStatus = 'overdue';
+                        else c.slaStatus = 'pending_sla';
                     }
                 }
+                return c;
             });
 
-            const SYSTEM_MOCK_TODAY = new Date(2026, 8, 3).getTime(); // September 3, 2026 as per context
+            // Descending Sort: Latest 1st QB Received
+            consolidatedCases.sort((a, b) => parseDateStrToTimestamp(b.qbReceivedDate) - parseDateStrToTimestamp(a.qbReceivedDate));
 
-            consolidatedCases = Object.values(casesMap)
-                .filter(c => c.rawUpdates.length > 0)
-                .map(c => {
-                    const stagesList = c.rawUpdates.map(u => (u["Progress Status"] || '').toLowerCase());
-                    c.latestStatus = getRowValue(c.rawUpdates[c.rawUpdates.length - 1], ['Progress Status']) || 'First';
-                    c.isFinal = stagesList.some(s => s.includes('final') || s.includes('close'));
-                    c.year = extractYearFromDate(c.dateOfOccurrence) || 'Unknown';
-                    
-                    // --- SLA Calculation ---
-                    c.hasReachedSecond = stagesList.some(s => s.includes('second') || s.includes('third') || s.includes('final'));
-                    c.slaBadgeHtml = `<span class="text-slate-300">-</span>`;
-                    
-                    const qbMs = parseDateStrToTimestamp(c.qbReceivedDate);
-                    
-                    if (qbMs > 0) {
-                        if (c.hasReachedSecond) {
-                            // Find the date the second report was submitted
-                            let secondStageDateStr = null;
-                            for (let u of c.rawUpdates) {
-                                let st = (u["Progress Status"] || '').toLowerCase();
-                                if (st.includes('second') || st.includes('third') || st.includes('final')) {
-                                    secondStageDateStr = u["Date"];
-                                    break;
-                                }
-                            }
-                            const secondMs = parseDateStrToTimestamp(secondStageDateStr);
-                            let daysTakenStr = "";
-                            if (secondMs > 0) {
-                                const daysTaken = Math.max(0, diffBusinessDays(qbMs, secondMs));
-                                daysTakenStr = ` in ${daysTaken}d`;
-                            }
-                            
-                            if (c.isFinal) {
-                                c.slaBadgeHtml = `<span class="px-2 py-0.5 rounded-full text-[9px] bg-emerald-100 text-emerald-800 font-bold border border-emerald-200">Completed${daysTakenStr}</span>`;
-                            } else {
-                                c.slaBadgeHtml = `<span class="px-2 py-0.5 rounded-full text-[9px] bg-teal-100 text-teal-800 font-bold border border-teal-200">On process${daysTakenStr}</span>`;
-                            }
-                        } else {
-                            // Still pending. Use system mock today.
-                            const daysElapsed = Math.max(0, diffBusinessDays(qbMs, SYSTEM_MOCK_TODAY));
-                            const daysRemaining = 3 - daysElapsed; // 3 Day SLA limit
-                            
-                            if (daysRemaining < 0) {
-                                c.slaBadgeHtml = `<span class="px-2 py-0.5 rounded-full text-[9px] bg-red-100 text-red-700 font-bold border border-red-300 animate-pulse">Overdue by ${Math.abs(daysRemaining)}d</span>`;
-                            } else {
-                                c.slaBadgeHtml = `<span class="px-2 py-0.5 rounded-full text-[9px] bg-amber-100 text-amber-800 font-bold border border-amber-300">${daysRemaining} days left</span>`;
-                            }
-                        }
-                    }
-
-                    return c;
-                });
-
-            consolidatedCases.sort((a, b) => {
-                const tA = parseDateStrToTimestamp(a.qbReceivedDate);
-                const tB = parseDateStrToTimestamp(b.qbReceivedDate);
-                if (tA !== tB) {
-                    if (tA === 0) return 1;
-                    if (tB === 0) return -1;
-                    return tB - tA;
-                }
-                return parseDateStrToTimestamp(b.dateOfOccurrence) - parseDateStrToTimestamp(a.dateOfOccurrence);
-            });
-
+            populateFilterDropdowns();
             applyFiltersAndRender();
-            if (fileName) showNotification(`Loaded dataset successfully from "${fileName}" (${consolidatedCases.length} cases found)`);
+            if (fileName) {
+                const el = document.getElementById('statusNotification');
+                document.getElementById('notificationMessage').innerText = `Dataset "${fileName}" updated successfully.`;
+                el.classList.remove('hidden');
+                setTimeout(() => el.classList.add('hidden'), 4000);
+            }
         }
 
-        function populateFilterDropdowns() {
-            const currentSubcontractor = document.getElementById('filterSubcontractor') ? document.getElementById('filterSubcontractor').value : '';
-            const currentCustomer = document.getElementById('filterCustomer') ? document.getElementById('filterCustomer').value : '';
-            const currentBase = document.getElementById('filterBase') ? document.getElementById('filterBase').value : '';
-            const currentSection = document.getElementById('filterSection') ? document.getElementById('filterSection').value : '';
-            const currentAccidentType = document.getElementById('filterAccidentType') ? document.getElementById('filterAccidentType').value : '';
-            const currentLiability = document.getElementById('filterLiability') ? document.getElementById('filterLiability').value : '';
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
 
-            const subcontractors = new Set();
-            const customers = new Set();
-            const bases = new Set();
-            const sections = new Set();
-            const accidentTypes = new Set();
-            const liabilities = new Set();
+        const FILTER_CONFIG = {
+            filterSubcontractor: c => c.subContractName,
+            filterCustomer: c => c.customerName,
+            filterBase: c => c.base,
+            filterSection: c => c.section,
+            filterAccidentType: c => c.typeOfAccident,
+            filterLiability: c => c.liability,
+            filterCaseDecision: c => c.caseDecision,
+            filterYear: c => extractYear(c.dateOfOccurrence)
+        };
 
-            consolidatedCases.forEach(c => {
-                if (matchesFilter(c, 'subcontractor') && c.subContractName) subcontractors.add(c.subContractName);
-                if (matchesFilter(c, 'customer') && c.customerName) customers.add(c.customerName);
-                if (matchesFilter(c, 'base') && c.base) bases.add(c.base);
-                if (matchesFilter(c, 'section') && c.section) sections.add(c.section);
-                if (matchesFilter(c, 'accidentType') && c.typeOfAccident) accidentTypes.add(c.typeOfAccident);
-                if (matchesFilter(c, 'liability') && c.liability) liabilities.add(c.liability);
+        function populateFilterDropdowns() { refreshLinkedFilterOptions(true); }
+
+        function refreshLinkedFilterOptions(isInitial = false) {
+            Object.entries(FILTER_CONFIG).forEach(([id, getter]) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const currentVal = el.value;
+                const available = consolidatedCases
+                    .filter(c => matchesFilter(c, false, id))
+                    .map(c => String(getter(c) || '').trim())
+                    .filter(Boolean);
+                const values = Array.from(new Set(available)).sort((a,b) => a.localeCompare(b, undefined, {numeric:true, sensitivity:'base'}));
+                if (currentVal && !values.includes(currentVal)) values.unshift(currentVal);
+                el.innerHTML = '<option value="">All (ทั้งหมด)</option>' + values.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
+                if (currentVal) el.value = currentVal;
+                else if (isInitial && id === 'filterCaseDecision' && values.includes('Offensive')) el.value = 'Offensive';
             });
-
-            buildOptions('filterSubcontractor', subcontractors, currentSubcontractor);
-            buildOptions('filterCustomer', customers, currentCustomer);
-            buildOptions('filterBase', bases, currentBase);
-            buildOptions('filterSection', sections, currentSection);
-            buildOptions('filterAccidentType', accidentTypes, currentAccidentType);
-            buildOptions('filterLiability', liabilities, currentLiability);
         }
 
-        function buildOptions(id, set, currentValue) {
-            const el = document.getElementById(id);
-            if (!el) return;
-            el.innerHTML = '<option value="">All (ทั้งหมด)</option>';
-            
-            const sortedValues = Array.from(set).sort();
-            sortedValues.forEach(v => {
-                const isSelected = v === currentValue ? 'selected' : '';
-                el.innerHTML += `<option value="${v.replace(/"/g, '&quot;')}" ${isSelected}>${v}</option>`;
-            });
+        function matchesFilter(c, ignoreMonth = false, ignoreFilterId = null) {
+            const getVal = (id) => {
+                const el = document.getElementById(id);
+                return el ? el.value.trim() : '';
+            };
 
-            if (currentValue && !set.has(currentValue)) {
-                el.innerHTML += `<option value="${currentValue.replace(/"/g, '&quot;')}" selected>${currentValue}</option>`;
-            }
-        }
+            const norm = v => String(v || '').trim().toLowerCase();
+            const fDec = getVal('filterCaseDecision');
+            if (ignoreFilterId !== 'filterCaseDecision' && fDec && norm(c.caseDecision) !== norm(fDec)) return false;
 
-        function matchesFilter(c, exclude = '') {
-            const fSub = document.getElementById('filterSubcontractor') ? document.getElementById('filterSubcontractor').value : '';
-            const fCust = document.getElementById('filterCustomer') ? document.getElementById('filterCustomer').value : '';
-            const fBase = document.getElementById('filterBase') ? document.getElementById('filterBase').value : '';
-            const fSec = document.getElementById('filterSection') ? document.getElementById('filterSection').value : '';
-            const fAccidentType = document.getElementById('filterAccidentType') ? document.getElementById('filterAccidentType').value : '';
-            const fLia = document.getElementById('filterLiability') ? document.getElementById('filterLiability').value : '';
-            const fMonthBasis = document.getElementById('filterMonthBasis') ? document.getElementById('filterMonthBasis').value : 'occurrence';
-            const fMonthSelect = document.getElementById('filterMonthSelect') ? document.getElementById('filterMonthSelect').value : '';
-            const search = document.getElementById('tableSearch') ? document.getElementById('tableSearch').value.toLowerCase() : '';
+            const fSub = getVal('filterSubcontractor');
+            if (ignoreFilterId !== 'filterSubcontractor' && fSub && norm(c.subContractName) !== norm(fSub)) return false;
 
-            if (exclude !== 'subcontractor' && fSub && c.subContractName !== fSub) return false;
-            if (exclude !== 'customer' && fCust && c.customerName !== fCust) return false;
-            if (exclude !== 'base' && fBase && c.base !== fBase) return false;
-            if (exclude !== 'section' && fSec && c.section !== fSec) return false;
-            if (exclude !== 'accidentType' && fAccidentType && c.typeOfAccident !== fAccidentType) return false;
-            if (exclude !== 'liability' && fLia && !c.liability.includes(fLia)) return false;
-            
-            if (exclude !== 'year' && selectedYearFilter && c.year !== selectedYearFilter) return false;
-            
-            if (exclude !== 'month' && fMonthSelect) {
-                let dateToCompare = '';
-                if (fMonthBasis === 'occurrence') {
-                    dateToCompare = c.dateOfOccurrence;
-                } else if (fMonthBasis === 'qbReceived') {
-                    dateToCompare = c.qbReceivedDate;
-                }
-                const m = extractMonthFromDate(dateToCompare);
-                if (m !== fMonthSelect) return false;
-            }
+            const fCust = getVal('filterCustomer');
+            if (ignoreFilterId !== 'filterCustomer' && fCust && norm(c.customerName) !== norm(fCust)) return false;
 
-            if (exclude !== 'severity' && selectedSeverityFilter) {
-                const cSev = (c.severity || '').toLowerCase();
-                if (selectedSeverityFilter === 'High' && !cSev.includes('high')) return false;
-                if (selectedSeverityFilter === 'Low' && !cSev.includes('low')) return false;
-                if (selectedSeverityFilter === 'Medium' && (cSev.includes('high') || cSev.includes('low'))) return false;
-            }
+            const fBase = getVal('filterBase');
+            if (ignoreFilterId !== 'filterBase' && fBase && norm(c.base) !== norm(fBase)) return false;
 
-            if (exclude !== 'status' && selectedStatusFilter) {
+            const fSec = getVal('filterSection');
+            if (ignoreFilterId !== 'filterSection' && fSec && norm(c.section) !== norm(fSec)) return false;
+
+            const fAcc = getVal('filterAccidentType');
+            if (ignoreFilterId !== 'filterAccidentType' && fAcc && norm(c.typeOfAccident) !== norm(fAcc)) return false;
+
+            const fLia = getVal('filterLiability');
+            if (ignoreFilterId !== 'filterLiability' && fLia && norm(c.liability) !== norm(fLia)) return false;
+
+            const fYear = getVal('filterYear');
+            if (ignoreFilterId !== 'filterYear' && fYear && extractYear(c.dateOfOccurrence) !== fYear) return false;
+
+            if (selectedStatusFilter) {
                 if (selectedStatusFilter === 'active' && c.isFinal) return false;
                 if (selectedStatusFilter === 'closed' && !c.isFinal) return false;
             }
 
-            if (exclude !== 'financial' && selectedFinancialFilter) {
-                if (selectedFinancialFilter === 'totalClaim' && !(c.totalClaim > 0)) return false;
-                if (selectedFinancialFilter === 'kllInsurance' && !(c.kllInsurance > 0)) return false;
-                if (selectedFinancialFilter === 'custInsurance' && !(c.custInsurance > 0)) return false;
-                if (selectedFinancialFilter === 'subInsurance' && !(c.subInsurance > 0)) return false;
-                if (selectedFinancialFilter === 'underConsideration' && !(c.claimUnderConsideration > 0)) return false;
-                if (selectedFinancialFilter === 'fineKll' && !(c.fineByKll > 0)) return false;
-                if (selectedFinancialFilter === 'fineCustomer' && !(c.fineByCustomer > 0)) return false;
+            if (selectedSeverityFilter) {
+                let cs = (c.severity || '').toLowerCase();
+                if (selectedSeverityFilter === 'High' && !cs.includes('high')) return false;
+                if (selectedSeverityFilter === 'Low' && !cs.includes('low')) return false;
+                if (selectedSeverityFilter === 'Medium' && (cs.includes('high') || cs.includes('low'))) return false;
             }
-            
-            if (exclude !== 'search' && search) {
-                const searchStr = search;
-                const matchReport = c.reportNo.toLowerCase().includes(searchStr);
-                const matchCust = c.customerName.toLowerCase().includes(searchStr);
-                const matchSub = c.subContractName.toLowerCase().includes(searchStr);
-                const matchNote = (c.note || '').toLowerCase().includes(searchStr);
-                if (!matchReport && !matchCust && !matchSub && !matchNote) return false;
+
+            if (selectedSlaFilter && c.slaStatus !== selectedSlaFilter) return false;
+
+            if (!ignoreMonth) {
+                const fm = getVal('filterMonthSelect');
+                const fBasis = getVal('filterMonthBasis') || 'qb';
+                if (fm) {
+                    let targetDate = fBasis === 'occ' ? c.dateOfOccurrence : c.qbReceivedDate;
+                    if (extractMonthFromDate(targetDate) !== fm) return false;
+                }
             }
+
+            const search = getVal('tableSearch').toLowerCase();
+            if (search) {
+                const reportMatch = (c.reportNo || '').toLowerCase().includes(search);
+                const custMatch = (c.customerName || '').toLowerCase().includes(search);
+                const secMatch = (c.section || '').toLowerCase().includes(search);
+                const typeMatch = (c.typeOfAccident || '').toLowerCase().includes(search);
+                if (!reportMatch && !custMatch && !secMatch && !typeMatch) return false;
+            }
+
             return true;
         }
 
-        function formatNumber(num) {
-            return num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-        }
-
-        function applyFiltersAndRender() {
-            populateFilterDropdowns();
-            filteredCases = consolidatedCases.filter(c => matchesFilter(c));
-            renderKPIs();
-            renderStatLists();
-            renderTrendChart();
-            renderTable();
-        }
-
-        function renderTrendChart() {
-            // Group cases by Year-Month of 1st QB Received
-            const cohortCounts = {};
-            filteredCases.forEach(c => {
-                const ym = extractYearMonthStr(c.qbReceivedDate);
-                if (ym) {
-                    cohortCounts[ym] = (cohortCounts[ym] || 0) + 1;
-                }
+        function clearAllFilters(clearDecision = false) {
+            ['filterSubcontractor', 'filterCustomer', 'filterBase', 'filterSection', 'filterAccidentType', 'filterLiability', 'filterYear', 'filterMonthSelect', 'tableSearch'].forEach(id => {
+                if (document.getElementById(id)) document.getElementById(id).value = '';
             });
-
-            // Sort chronologically
-            const sortedLabels = Object.keys(cohortCounts).sort((a,b) => a.localeCompare(b));
-            const dataPoints = sortedLabels.map(l => cohortCounts[l]);
-
-            if (myTrendChart) {
-                myTrendChart.destroy();
-            }
-
-            const ctx = document.getElementById('monthlyTrendLineChart').getContext('2d');
-            myTrendChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: sortedLabels,
-                    datasets: [{
-                        label: 'Cases by 1st QB Received',
-                        data: dataPoints,
-                        borderColor: '#f43f5e',
-                        backgroundColor: 'rgba(244, 63, 94, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.3,
-                        pointBackgroundColor: '#f43f5e',
-                        pointBorderColor: '#fff',
-                        pointRadius: 6,
-                        pointHoverRadius: 9,
-                        cursor: 'pointer'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    onHover: (event, chartElement) => {
-                        event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
-                    },
-                    onClick: (event, activeElements) => {
-                        if (activeElements.length > 0) {
-                            const firstPoint = activeElements[0];
-                            const label = myTrendChart.data.labels[firstPoint.index];
-                            if(label) {
-                                const monthParts = label.split('-');
-                                if(monthParts.length >= 2) {
-                                    const monthCode = monthParts[1];
-                                    const el = document.getElementById('filterMonthSelect');
-                                    if (el) {
-                                        // สลับการเลือกหรือยกเลิกตัวกรอง
-                                        el.value = (el.value === monthCode) ? "" : monthCode;
-                                        currentPage = 1;
-                                        applyFiltersAndRender();
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false },
-                        datalabels: {
-                            align: 'top',
-                            color: '#e11d48',
-                            font: { size: 11, weight: 'bold' }
-                        }
-                    },
-                    scales: {
-                        y: { 
-                            beginAtZero: true, 
-                            ticks: { precision: 0, font: { size: 10 } },
-                            suggestedMax: Math.max(...dataPoints, 5) + 1 
-                        },
-                        x: { 
-                            ticks: { font: { size: 10 } },
-                            offset: true 
-                        }
-                    }
-                },
-                plugins: [ChartDataLabels]
-            });
-        }
-
-        function toggleFinancialFilter(type) {
-            selectedFinancialFilter = (selectedFinancialFilter === type) ? null : type;
-            currentPage = 1;
-            applyFiltersAndRender();
-        }
-
-        function renderKPIs() {
-            document.getElementById('kpiTotalCases').innerText = filteredCases.length;
+            if (document.getElementById('filterMonthBasis')) document.getElementById('filterMonthBasis').value = 'qb';
             
-            let openC = 0, closedC = 0;
-            consolidatedCases.forEach(c => {
-                if (matchesFilter(c, 'status')) {
-                    if (c.isFinal) closedC++;
-                    else openC++;
-                }
-            });
-            document.getElementById('kpiOpenCases').innerText = openC;
-            document.getElementById('kpiClosedCases').innerText = closedC;
-
-            const activeCard = document.getElementById('activeCasesCard');
-            const closedCard = document.getElementById('closedCasesCard');
-
-            if (selectedStatusFilter === 'active') {
-                activeCard.className = "bg-rose-50 p-4 rounded-xl shadow-md border-2 border-rose-500 flex items-center justify-between cursor-pointer transition duration-200";
-                closedCard.className = "bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between cursor-pointer hover:border-slate-300 hover:shadow-md transition duration-200 opacity-60";
-            } else if (selectedStatusFilter === 'closed') {
-                closedCard.className = "bg-slate-100 p-4 rounded-xl shadow-md border-2 border-slate-500 flex items-center justify-between cursor-pointer transition duration-200";
-                activeCard.className = "bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between cursor-pointer hover:border-slate-300 hover:shadow-md transition duration-200 opacity-60";
+            if (clearDecision) {
+                if (document.getElementById('filterCaseDecision')) document.getElementById('filterCaseDecision').value = '';
             } else {
-                activeCard.className = "bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between cursor-pointer hover:border-rose-300 hover:shadow-md transition duration-200";
-                closedCard.className = "bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between cursor-pointer hover:border-slate-400 hover:shadow-md transition duration-200";
+                if (document.getElementById('filterCaseDecision')) document.getElementById('filterCaseDecision').value = 'Offensive';
             }
-
-            let totalClaims = 0;
-            let kllInsurance = 0;
-            let custInsurance = 0;
-            let subInsurance = 0;
-            let claimUnderConsideration = 0;
-            let fineKll = 0;
-            let fineCustomer = 0;
-
-            consolidatedCases.forEach(c => {
-                if (matchesFilter(c, 'financial')) {
-                    totalClaims += (c.totalClaim || 0);
-                    kllInsurance += (c.kllInsurance || 0);
-                    custInsurance += (c.custInsurance || 0);
-                    subInsurance += (c.subInsurance || 0);
-                    claimUnderConsideration += (c.claimUnderConsideration || 0);
-                    fineKll += (c.fineByKll || 0);
-                    fineCustomer += (c.fineByCustomer || 0);
-                }
-            });
-
-            document.getElementById('finTotalClaims').innerText = "฿" + formatNumber(totalClaims);
-            document.getElementById('finKllInsurance').innerText = "฿" + formatNumber(kllInsurance);
-            document.getElementById('finCustInsurance').innerText = "฿" + formatNumber(custInsurance);
-            document.getElementById('finSubInsurance').innerText = "฿" + formatNumber(subInsurance);
-            document.getElementById('finUnderConsideration').innerText = "฿" + formatNumber(claimUnderConsideration);
-            document.getElementById('finFineKll').innerText = "฿" + formatNumber(fineKll);
-            document.getElementById('finFineCustomer').innerText = "฿" + formatNumber(fineCustomer);
-
-            const cardsConfig = {
-                totalClaim: { id: 'cardFin_totalClaim', baseClass: 'bg-rose-50/90 border border-rose-200', activeClass: 'bg-rose-100 border-2 border-rose-500 ring-2 ring-rose-200 shadow-md scale-[1.02]' },
-                underConsideration: { id: 'cardFin_underConsideration', baseClass: 'bg-orange-50/90 border border-orange-200', activeClass: 'bg-orange-100 border-2 border-orange-400 ring-2 ring-orange-200 shadow-md scale-[1.02]' },
-                kllInsurance: { id: 'cardFin_kllInsurance', baseClass: 'bg-slate-100/90 border border-slate-300/80', activeClass: 'bg-slate-200 border-2 border-slate-600 ring-2 ring-slate-300 shadow-md scale-[1.02]' },
-                custInsurance: { id: 'cardFin_custInsurance', baseClass: 'bg-pink-50/80 border border-pink-200', activeClass: 'bg-pink-100 border-2 border-pink-400 ring-2 ring-pink-200 shadow-md scale-[1.02]' },
-                subInsurance: { id: 'cardFin_subInsurance', baseClass: 'bg-zinc-100/90 border border-zinc-300/80', activeClass: 'bg-zinc-200 border-2 border-zinc-600 ring-2 ring-zinc-300 shadow-md scale-[1.02]' },
-                fineCustomer: { id: 'cardFin_fineCustomer', baseClass: 'bg-stone-100/90 border border-stone-300', activeClass: 'bg-stone-200 border-2 border-stone-600 ring-2 ring-stone-300 shadow-md scale-[1.02]' },
-                fineKll: { id: 'cardFin_fineKll', baseClass: 'bg-rose-100/70 border border-rose-300', activeClass: 'bg-rose-200 border-2 border-rose-600 ring-2 ring-rose-300 shadow-md scale-[1.02]' }
-            };
-
-            const clearBtn = document.getElementById('clearFinFilterBtn');
-            if (selectedFinancialFilter) {
-                clearBtn.classList.remove('hidden');
-            } else {
-                clearBtn.classList.add('hidden');
-            }
-
-            Object.keys(cardsConfig).forEach(key => {
-                const conf = cardsConfig[key];
-                const cardEl = document.getElementById(conf.id);
-                if (!cardEl) return;
-                const indicatorEl = cardEl.querySelector('.fin-indicator');
-                
-                if (selectedFinancialFilter === key) {
-                    cardEl.className = `${conf.activeClass} p-3 rounded-xl relative overflow-hidden cursor-pointer transition duration-200`;
-                    if (indicatorEl) indicatorEl.classList.remove('hidden');
-                } else {
-                    let mutedStyle = selectedFinancialFilter ? 'opacity-50 hover:opacity-100' : '';
-                    cardEl.className = `${conf.baseClass} ${mutedStyle} p-3 rounded-xl relative overflow-hidden cursor-pointer hover:border-slate-400 hover:shadow-md transition duration-200`;
-                    if (indicatorEl) indicatorEl.classList.add('hidden');
-                }
-            });
-
-            const allYears = Array.from(new Set(consolidatedCases.map(c => c.year))).sort();
-            const annualCounts = {};
-            allYears.forEach(y => annualCounts[y] = 0);
             
-            consolidatedCases.forEach(c => {
-                if (matchesFilter(c, 'year')) {
-                    annualCounts[c.year]++;
-                }
-            });
-
-            const annualContainer = document.getElementById('annualKPIContainer');
-            annualContainer.innerHTML = '';
-            Object.keys(annualCounts).sort().forEach(yr => {
-                const isActive = selectedYearFilter === yr;
-                annualContainer.innerHTML += `
-                    <div onclick="toggleYearFilter('${yr}')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-rose-300 transition ${isActive ? 'kpi-card-active' : ''}">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase">Year ${yr}</span>
-                            ${isActive ? '<i data-lucide="check" class="w-3 h-3 text-white"></i>' : '<i data-lucide="calendar" class="w-3 h-3 text-slate-400"></i>'}
-                        </div>
-                        <span class="block text-xl font-black text-slate-800 mt-1">${annualCounts[yr]} <span class="text-xs font-normal text-slate-400">เคส</span></span>
-                    </div>`;
-            });
-
-            const sevCounts = { High: 0, Medium: 0, Low: 0 };
-            consolidatedCases.forEach(c => {
-                if (matchesFilter(c, 'severity')) {
-                    const sevText = (c.severity || '').toLowerCase();
-                    if (sevText.includes('high')) sevCounts.High++;
-                    else if (sevText.includes('low')) sevCounts.Low++;
-                    else sevCounts.Medium++;
-                }
-            });
-
-            const isActiveHigh = selectedSeverityFilter === 'High';
-            const isActiveMed = selectedSeverityFilter === 'Medium';
-            const isActiveLow = selectedSeverityFilter === 'Low';
-
-            const sevContainer = document.getElementById('severityKPIContainer');
-            sevContainer.innerHTML = `
-                <div onclick="toggleSeverityFilter('High')" class="cursor-pointer transition duration-200 p-3 rounded-xl border flex flex-col justify-between ${isActiveHigh ? 'bg-rose-600 text-white border-rose-700 shadow-md' : 'bg-rose-50/90 border-rose-200 text-slate-800 hover:border-rose-400'}">
-                    <div class="flex items-center justify-between">
-                        <span class="text-[9px] font-bold ${isActiveHigh ? 'text-rose-100' : 'text-rose-700'} uppercase">High (สูง)</span>
-                        ${isActiveHigh ? '<i data-lucide="check" class="w-3.5 h-3.5 text-white"></i>' : '<i data-lucide="alert-octagon" class="w-3.5 h-3.5 text-rose-600"></i>'}
-                    </div>
-                    <span class="block text-xl font-black mt-1 ${isActiveHigh ? 'text-white' : 'text-rose-800'}">${sevCounts.High} <span class="text-xs font-normal ${isActiveHigh ? 'text-rose-200' : 'text-rose-500'}">เคส</span></span>
-                </div>
-                <div onclick="toggleSeverityFilter('Medium')" class="cursor-pointer transition duration-200 p-3 rounded-xl border flex flex-col justify-between ${isActiveMed ? 'bg-slate-700 text-white border-slate-800 shadow-md' : 'bg-slate-100 border-slate-300 text-slate-800 hover:border-slate-400'}">
-                    <div class="flex items-center justify-between">
-                        <span class="text-[9px] font-bold ${isActiveMed ? 'text-slate-200' : 'text-slate-700'} uppercase">Medium (กลาง)</span>
-                        ${isActiveMed ? '<i data-lucide="check" class="w-3.5 h-3.5 text-white"></i>' : '<i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-slate-600"></i>'}
-                    </div>
-                    <span class="block text-xl font-black mt-1 ${isActiveMed ? 'text-white' : 'text-slate-800'}">${sevCounts.Medium} <span class="text-xs font-normal ${isActiveMed ? 'text-slate-300' : 'text-slate-500'}">เคส</span></span>
-                </div>
-                <div onclick="toggleSeverityFilter('Low')" class="cursor-pointer transition duration-200 p-3 rounded-xl border flex flex-col justify-between ${isActiveLow ? 'bg-slate-500 text-white border-slate-600 shadow-md' : 'bg-slate-50 border-slate-200 text-slate-800 hover:border-slate-300'}">
-                    <div class="flex items-center justify-between">
-                        <span class="text-[9px] font-bold ${isActiveLow ? 'text-slate-100' : 'text-slate-600'} uppercase">Low (น้อย)</span>
-                        ${isActiveLow ? '<i data-lucide="check" class="w-3.5 h-3.5 text-white"></i>' : '<i data-lucide="shield" class="w-3.5 h-3.5 text-slate-500"></i>'}
-                    </div>
-                    <span class="block text-xl font-black mt-1 ${isActiveLow ? 'text-white' : 'text-slate-700'}">${sevCounts.Low} <span class="text-xs font-normal ${isActiveLow ? 'text-slate-200' : 'text-slate-500'}">เคส</span></span>
-                </div>`;
-            lucide.createIcons();
-        }
-
-        function toggleYearFilter(year) {
-            selectedYearFilter = (selectedYearFilter === year) ? null : year;
-            applyFiltersAndRender();
-        }
-
-        function toggleSeverityFilter(severity) {
-            selectedSeverityFilter = (selectedSeverityFilter === severity) ? null : severity;
-            applyFiltersAndRender();
-        }
-
-        function toggleStatusFilter(status) {
-            selectedStatusFilter = (selectedStatusFilter === status) ? null : status;
-            applyFiltersAndRender();
-        }
-
-        function renderStatLists() {
-            const accMap = {}, secMap = {};
-            filteredCases.forEach(c => {
-                const t = c.typeOfAccident || 'Unspecified';
-                accMap[t] = (accMap[t] || 0) + 1;
-                const s = c.section || 'Unspecified';
-                secMap[s] = (secMap[s] || 0) + 1;
-            });
-
-            const vibrantRedGrayPastels = [
-                '#f87171', '#94a3b8', '#fb7185', '#64748b', '#f472b6', '#cbd5e1', '#fda4af', '#475569', '#fca5a5', '#e2e8f0'
-            ];
-
-            const accLabels = Object.keys(accMap);
-            const accData = Object.values(accMap);
-
-            if (myPieChart) {
-                myPieChart.destroy();
-            }
-
-            const ctxAcc = document.getElementById('accidentTypePieChart').getContext('2d');
-            if (accLabels.length > 0) {
-                myPieChart = new Chart(ctxAcc, {
-                    type: 'doughnut',
-                    data: {
-                        labels: accLabels,
-                        datasets: [{
-                            data: accData,
-                            backgroundColor: vibrantRedGrayPastels.slice(0, accLabels.length),
-                            borderWidth: 2,
-                            borderColor: '#ffffff'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        onClick: (event, activeElements) => {
-                            if (activeElements.length > 0) {
-                                const firstPoint = activeElements[0];
-                                const label = myPieChart.data.labels[firstPoint.index];
-                                const el = document.getElementById('filterAccidentType');
-                                if (el) {
-                                    el.value = (el.value === label) ? "" : label;
-                                    currentPage = 1;
-                                    applyFiltersAndRender();
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    boxWidth: 10,
-                                    padding: 8,
-                                    font: { family: 'Inter, Sarabun', size: 9, weight: '600' },
-                                    color: '#334155'
-                                }
-                            },
-                            tooltip: {
-                                backgroundColor: '#1e293b',
-                                titleFont: { family: 'Sarabun', size: 11 },
-                                bodyFont: { family: 'Sarabun', size: 11 },
-                                callbacks: {
-                                    label: function(context) {
-                                        return `  ${context.label}: ${context.raw} เคส`;
-                                    }
-                                }
-                            },
-                            datalabels: {
-                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                borderColor: 'rgba(226, 232, 240, 0.8)',
-                                borderWidth: 1,
-                                borderRadius: 8,
-                                color: '#1e293b',
-                                font: { family: 'Inter, Sarabun', weight: '700', size: 9 },
-                                padding: { top: 4, bottom: 4, left: 6, right: 6 },
-                                textAlign: 'center',
-                                formatter: (value, context) => {
-                                    const label = context.chart.data.labels[context.dataIndex];
-                                    let shortLabel = label.length > 15 ? label.substring(0, 15) + '...' : label;
-                                    return `${shortLabel}\n${value} เคส`;
-                                },
-                                display: function(context) {
-                                    let dataset = context.dataset.data;
-                                    let total = dataset.reduce((a, b) => a + b, 0);
-                                    let value = dataset[context.dataIndex];
-                                    return (value / total) > 0.05;
-                                },
-                                align: 'center',
-                                anchor: 'center'
-                            }
-                        },
-                        cutout: '50%'
-                    },
-                    plugins: [ChartDataLabels]
-                });
-            } else {
-                ctxAcc.clearRect(0, 0, 300, 300);
-            }
-
-            const secLabels = Object.keys(secMap);
-            const secData = Object.values(secMap);
-
-            if (mySectionPieChart) {
-                mySectionPieChart.destroy();
-            }
-
-            const ctxSec = document.getElementById('sectionPieChart').getContext('2d');
-            if (secLabels.length > 0) {
-                mySectionPieChart = new Chart(ctxSec, {
-                    type: 'doughnut',
-                    data: {
-                        labels: secLabels,
-                        datasets: [{
-                            data: secData,
-                            backgroundColor: [...vibrantRedGrayPastels].reverse().slice(0, secLabels.length),
-                            borderWidth: 2,
-                            borderColor: '#ffffff'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        onClick: (event, activeElements) => {
-                            if (activeElements.length > 0) {
-                                const firstPoint = activeElements[0];
-                                const label = mySectionPieChart.data.labels[firstPoint.index];
-                                const el = document.getElementById('filterSection');
-                                if (el) {
-                                    el.value = (el.value === label) ? "" : label;
-                                    currentPage = 1;
-                                    applyFiltersAndRender();
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    boxWidth: 10,
-                                    padding: 8,
-                                    font: { family: 'Inter, Sarabun', size: 9, weight: '600' },
-                                    color: '#334155'
-                                }
-                            },
-                            tooltip: {
-                                backgroundColor: '#1e293b',
-                                titleFont: { family: 'Sarabun', size: 11 },
-                                bodyFont: { family: 'Sarabun', size: 11 },
-                                callbacks: {
-                                    label: function(context) {
-                                        return `  ${context.label}: ${context.raw} เคส`;
-                                    }
-                                }
-                            },
-                            datalabels: {
-                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                borderColor: 'rgba(226, 232, 240, 0.8)',
-                                borderWidth: 1,
-                                borderRadius: 8,
-                                color: '#1e293b',
-                                font: { family: 'Inter, Sarabun', weight: '700', size: 9 },
-                                padding: { top: 4, bottom: 4, left: 6, right: 6 },
-                                textAlign: 'center',
-                                formatter: (value, context) => {
-                                    const label = context.chart.data.labels[context.dataIndex];
-                                    let shortLabel = label.length > 15 ? label.substring(0, 15) + '...' : label;
-                                    return `${shortLabel}\n${value} เคส`;
-                                },
-                                display: function(context) {
-                                    let dataset = context.dataset.data;
-                                    let total = dataset.reduce((a, b) => a + b, 0);
-                                    let value = dataset[context.dataIndex];
-                                    return (value / total) > 0.05;
-                                },
-                                align: 'center',
-                                anchor: 'center'
-                            }
-                        },
-                        cutout: '50%'
-                    },
-                    plugins: [ChartDataLabels]
-                });
-            } else {
-                ctxSec.clearRect(0, 0, 300, 300);
-            }
-        }
-
-        function renderTable() {
-            const tbody = document.getElementById('casesTableBody');
-            tbody.innerHTML = '';
-            const total = filteredCases.length;
-            if (total === 0) {
-                tbody.innerHTML = `<tr><td colspan="15" class="text-center py-6 text-slate-400">No matching records found.</td></tr>`;
-                return;
-            }
-            const start = (currentPage - 1) * itemsPerPage;
-            const paged = filteredCases.slice(start, start + itemsPerPage);
-
-            paged.forEach(c => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-rose-50/30 border-b border-slate-100 transition duration-150";
-                
-                let sevBadge = '';
-                const sevText = (c.severity || '').toLowerCase();
-                if (sevText.includes('high')) {
-                    sevBadge = `<span class="px-2 py-0.5 rounded text-[10px] bg-rose-100 text-rose-800 font-extrabold uppercase border border-rose-200">High</span>`;
-                } else if (sevText.includes('low')) {
-                    sevBadge = `<span class="px-2 py-0.5 rounded text-[10px] bg-slate-100 text-slate-700 font-extrabold uppercase border border-slate-200">Low</span>`;
-                } else {
-                    sevBadge = `<span class="px-2 py-0.5 rounded text-[10px] bg-slate-200 text-slate-800 font-extrabold uppercase border border-slate-300">Medium</span>`;
-                }
-
-                let simpleStatus = 'First';
-                const lowerStatus = c.latestStatus.toLowerCase();
-                if (lowerStatus.includes('final') || lowerStatus.includes('close')) {
-                    simpleStatus = 'Final';
-                } else if (lowerStatus.includes('third')) {
-                    simpleStatus = 'Third';
-                } else if (lowerStatus.includes('second') || lowerStatus.includes('progress')) {
-                    simpleStatus = 'Second';
-                }
-
-                let statusClass = 'bg-slate-100 text-slate-700 border-slate-200';
-                if (simpleStatus === 'First') {
-                    statusClass = 'bg-rose-50 text-rose-700 border-rose-200';
-                } else if (simpleStatus === 'Final') {
-                    statusClass = 'bg-slate-700 text-white border-slate-800';
-                } else {
-                    statusClass = 'bg-slate-100 text-slate-800 border-slate-300';
-                }
-
-                const rawFollowUp = c.dateFollowUp || '-';
-                const parsedFollowUpList = rawFollowUp
-                    .split(/[\s,;\n]+/)
-                    .map(d => d.trim())
-                    .filter(d => d.length > 0 && d !== '-');
-
-                let followUpHtml = '-';
-                if (parsedFollowUpList.length > 0) {
-                    followUpHtml = parsedFollowUpList
-                        .map(date => `<span class="block">${date}</span>`)
-                        .join('');
-                }
-
-                // Column 1: Financial & Claim Breakdown (Claims, Fines, Insurance)
-                let finHtml = `<div class="font-extrabold text-rose-700 text-xs">฿${formatNumber(c.totalClaim || 0)}</div>`;
-                
-                let extraFinBadges = [];
-                if (c.fineByKll > 0) {
-                    extraFinBadges.push(`<span class="inline-block bg-rose-100 text-rose-900 border border-rose-200 px-1.5 py-0.5 rounded text-[9px] font-bold" title="Fine by KLL">Fine KLL: ฿${formatNumber(c.fineByKll)}</span>`);
-                }
-                if (c.fineByCustomer > 0) {
-                    extraFinBadges.push(`<span class="inline-block bg-stone-200 text-stone-900 border border-stone-300 px-1.5 py-0.5 rounded text-[9px] font-bold" title="Fine by Customer">Fine Cust: ฿${formatNumber(c.fineByCustomer)}</span>`);
-                }
-                if (c.kllInsurance > 0) {
-                    extraFinBadges.push(`<span class="inline-block bg-slate-200 text-slate-800 border border-slate-300 px-1.5 py-0.5 rounded text-[9px] font-bold" title="KLL's Insurance">Ins. KLL: ฿${formatNumber(c.kllInsurance)}</span>`);
-                }
-                if (c.custInsurance > 0) {
-                    extraFinBadges.push(`<span class="inline-block bg-pink-100 text-pink-800 border border-pink-200 px-1.5 py-0.5 rounded text-[9px] font-bold" title="Customer's Insurance">Ins. Cust: ฿${formatNumber(c.custInsurance)}</span>`);
-                }
-                if (c.subInsurance > 0) {
-                    extraFinBadges.push(`<span class="inline-block bg-zinc-200 text-zinc-800 border border-zinc-300 px-1.5 py-0.5 rounded text-[9px] font-bold" title="Sub's Insurance">Ins. Sub: ฿${formatNumber(c.subInsurance)}</span>`);
-                }
-                if (c.claimUnderConsideration > 0) {
-                    extraFinBadges.push(`<span class="inline-block bg-orange-100 text-orange-800 border border-orange-200 px-1.5 py-0.5 rounded text-[9px] font-bold" title="Claim under consideration">Under Cons: ฿${formatNumber(c.claimUnderConsideration)}</span>`);
-                }
-
-                if (extraFinBadges.length > 0) {
-                    finHtml += `<div class="flex flex-wrap gap-1 mt-1 max-w-[170px]">${extraFinBadges.join('')}</div>`;
-                }
-
-                // Column 2: Job Financial Performance (Revenue, Cost, Transportation, Profit) separated out
-                let jobPerfHtml = '<span class="text-slate-400 font-normal">-</span>';
-                let jobBadges = [];
-                if (c.revenue > 0) {
-                    jobBadges.push(`<span class="inline-block bg-emerald-100 text-emerald-900 border border-emerald-200 px-1.5 py-0.5 rounded text-[9px] font-bold" title="Revenue">Rev: ฿${formatNumber(c.revenue)}</span>`);
-                }
-                if (c.cost > 0) {
-                    jobBadges.push(`<span class="inline-block bg-slate-200 text-slate-800 border border-slate-300 px-1.5 py-0.5 rounded text-[9px] font-bold" title="Cost">Cost: ฿${formatNumber(c.cost)}</span>`);
-                }
-                if (c.transportation > 0) {
-                    jobBadges.push(`<span class="inline-block bg-sky-100 text-sky-900 border border-sky-200 px-1.5 py-0.5 rounded text-[9px] font-bold" title="Transportation">Trans: ฿${formatNumber(c.transportation)}</span>`);
-                }
-                if (c.profit !== 0) {
-                    const profitColor = c.profit >= 0 ? 'bg-teal-100 text-teal-900 border-teal-200' : 'bg-red-100 text-red-900 border-red-200';
-                    jobBadges.push(`<span class="inline-block ${profitColor} px-1.5 py-0.5 rounded text-[9px] font-bold" title="Profit">Profit: ฿${formatNumber(c.profit)}</span>`);
-                }
-
-                if (jobBadges.length > 0) {
-                    jobPerfHtml = `<div class="flex flex-wrap gap-1 max-w-[170px]">${jobBadges.join('')}</div>`;
-                }
-
-                tr.innerHTML = `
-                    <td class="py-2.5 px-2 text-center">
-                        <button onclick="viewCaseDetail('${c.reportNo}')" class="text-slate-700 bg-slate-100 hover:bg-slate-700 hover:text-white px-2.5 py-1 rounded-md font-bold transition flex items-center mx-auto text-[10px] shadow-sm border border-slate-200">
-                            <i data-lucide="folder-search" class="w-3 h-3 mr-1 text-rose-500"></i> View
-                        </button>
-                    </td>
-                    <td class="py-2.5 px-2 font-semibold text-slate-700">${c.reportNo}</td>
-                    <td class="py-2.5 px-2">
-                        <div class="text-[10px] text-slate-800 font-medium line-clamp-2 max-w-[120px] leading-tight break-words" title="${c.customerName || ''}">
-                            ${c.customerName}
-                        </div>
-                    </td>
-                    <td class="py-2.5 px-2 bg-rose-50/40 border-l border-rose-100/80">${finHtml}</td>
-                    <td class="py-2.5 px-2 bg-emerald-50/30 border-r border-emerald-100/80">${jobPerfHtml}</td>
-                    <td class="py-2.5 px-2 text-slate-500 font-medium">${c.dateOfOccurrence}</td>
-                    <td class="py-2.5 px-2 text-slate-900 font-black bg-slate-100/60">${c.qbReceivedDate || '-'}</td>
-                    <td class="py-2.5 px-2 text-center">${c.slaBadgeHtml}</td>
-                    <td class="py-2.5 px-2 text-center">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold border ${statusClass} tracking-wide inline-block shadow-sm">
-                            ${simpleStatus}
-                        </span>
-                    </td>
-                    <td class="py-2.5 px-2 text-[10px] text-slate-500 font-medium leading-normal bg-slate-50/20 whitespace-nowrap">
-                        ${followUpHtml}
-                    </td>
-                    <td class="py-2.5 px-2 text-slate-600 text-[10px]">${c.section || '-'}</td>
-                    <td class="py-2.5 px-2 font-medium text-slate-600 text-[10px]">${c.typeOfAccident || '-'}</td>
-                    <td class="py-2.5 px-2">
-                        <div class="text-[10px] text-slate-600 font-medium line-clamp-2 max-w-[100px] leading-tight break-words" title="${c.subContractName || ''}">
-                            ${c.subContractName || '-'}
-                        </div>
-                    </td>
-                    <td class="py-2.5 px-2 text-center">${sevBadge}</td>
-                    <td class="py-2.5 px-2"><span class="px-1.5 py-0.5 rounded text-[10px] bg-slate-100 text-slate-700 font-bold border border-slate-200">${c.liability || '-'}</span></td>
-                    <td class="py-2.5 px-2">
-                        <div class="text-[10px] text-slate-600 font-medium line-clamp-2 min-w-[120px] max-w-[180px] leading-tight break-words" title="${c.note || ''}">
-                            ${c.note || '-'}
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-            document.getElementById('tableRecordCount').innerText = `Showing ${start + 1} to ${Math.min(start + itemsPerPage, total)} of ${total} cases`;
-            buildPagination(Math.ceil(total / itemsPerPage));
-            lucide.createIcons();
-        }
-
-        function buildPagination(totalPages) {
-            const wrapper = document.getElementById('paginationControls');
-            wrapper.innerHTML = '';
-            if (totalPages <= 1) return;
-            for (let i = 1; i <= totalPages; i++) {
-                wrapper.innerHTML += `<button onclick="currentPage=${i}; renderTable();" class="px-2.5 py-1 text-xs font-bold rounded ${currentPage === i ? 'bg-[#1e293b] text-white' : 'border border-slate-200 hover:bg-slate-50'}\">${i}</button>`;
-            }
-        }
-
-        let activeCaseScope = null;
-
-        function viewCaseDetail(reportNo) {
-            const found = consolidatedCases.find(c => c.reportNo === reportNo);
-            if (!found) return;
-            activeCaseScope = found;
-
-            document.getElementById('modalReportNo').innerText = found.reportNo;
-            document.getElementById('modalCustomerName').innerText = found.customerName;
-            document.getElementById('summaryCustomer').innerText = found.customerName;
-            document.getElementById('summaryTotalClaims').innerText = "฿" + formatNumber(found.totalClaim || 0);
-            document.getElementById('summaryFineKll').innerText = "฿" + formatNumber(found.fineByKll || 0);
-            document.getElementById('summaryFineCustomer').innerText = "฿" + formatNumber(found.fineByCustomer || 0);
-            document.getElementById('summaryLiability').innerText = found.liability || '-';
-
-            document.getElementById('summaryRevenue').innerText = "฿" + formatNumber(found.revenue || 0);
-            document.getElementById('summaryCost').innerText = "฿" + formatNumber(found.cost || 0);
-            document.getElementById('summaryTransportation').innerText = "฿" + formatNumber(found.transportation || 0);
-            document.getElementById('summaryProfit').innerText = "฿" + formatNumber(found.profit || 0);
-
-            document.getElementById('modalFinRevenue').innerText = "฿" + formatNumber(found.revenue || 0);
-            document.getElementById('modalFinCost').innerText = "฿" + formatNumber(found.cost || 0);
-            document.getElementById('modalFinTransport').innerText = "฿" + formatNumber(found.transportation || 0);
-            document.getElementById('modalFinProfit').innerText = "฿" + formatNumber(found.profit || 0);
-
-            document.getElementById('modalFinTotalClaim').innerText = "฿" + formatNumber(found.totalClaim || 0);
-            document.getElementById('modalFinKllIns').innerText = "฿" + formatNumber(found.kllInsurance || 0);
-            document.getElementById('modalFinCustIns').innerText = "฿" + formatNumber(found.custInsurance || 0);
-            document.getElementById('modalFinSubIns').innerText = "฿" + formatNumber(found.subInsurance || 0);
-            document.getElementById('modalFinUnderCons').innerText = "฿" + formatNumber(found.claimUnderConsideration || 0);
-            document.getElementById('modalFinFineKll').innerText = "฿" + formatNumber(found.fineByKll || 0);
-            document.getElementById('modalFinFineCust').innerText = "฿" + formatNumber(found.fineByCustomer || 0);
-
-            const container = document.getElementById('modalTimelineContainer');
-            container.innerHTML = '';
-
-            found.rawUpdates.forEach(upd => {
-                const status = getRowValue(upd, ['Progress Status']);
-                const lowerStatus = status.toLowerCase();
-                const details = getRowValue(upd, ['Details of accident', 'Details of classification', 'Details']) || '-';
-                const date = getRowValue(upd, ['Progress date', 'Report issue date']) || '-';
-
-                let cardHtml = '';
-                if (lowerStatus.includes('first')) {
-                    const placeVal = getRowValue(upd, ['Occurrence area (base)', 'Base', 'Area', 'Place of accident']) || '-';
-                    const reporterVal = getRowValue(upd, ['Reporter', 'Reported by', 'Reporter Name', 'ผู้รายงาน']) || '-';
-                    
-                    cardHtml = `
-                        <div class="bg-white border border-slate-200 rounded-xl p-5 mb-3 space-y-4 shadow-sm">
-                            <div class="flex justify-between font-bold text-rose-700 border-b pb-2">
-                                <span class="flex items-center"><i data-lucide="flag" class="w-4 h-4 mr-1.5 text-rose-500"></i>▸ ${status.toUpperCase()}</span>
-                                <span class="text-slate-400 text-xs font-medium">Date: ${date}</span>
-                            </div>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs text-slate-600 bg-slate-50/50 p-3 rounded-xl border border-slate-100">
-                                <div><b class="text-slate-400 uppercase tracking-wide block text-[9px] mb-0.5">Section</b> <span class="text-slate-800 font-semibold">${found.section || '-'}</span></div>
-                                <div><b class="text-slate-400 uppercase tracking-wide block text-[9px] mb-0.5">วันที่เกิดเหตุ / Date</b> <span class="text-slate-800 font-semibold">${found.dateOfOccurrence || '-'}</span></div>
-                                <div><b class="text-slate-400 uppercase tracking-wide block text-[9px] mb-0.5 text-slate-600">1st QB Received Date</b> <span class="text-slate-700 font-bold">${found.qbReceivedDate || '-'}</span></div>
-                                <div><b class="text-slate-400 uppercase tracking-wide block text-[9px] mb-0.5">สถานที่เกิดเหตุ / Occurrence Area</b> <span class="text-slate-800 font-semibold">${placeVal}</span></div>
-                                <div><b class="text-slate-400 uppercase tracking-wide block text-[9px] mb-0.5">Sub contract name</b> <span class="text-slate-800 font-semibold">${found.subContractName || '-'}</span></div>
-                            </div>
-
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-slate-50/30 p-3 rounded-xl border border-slate-200/60">
-                                <div>
-                                    <span class="text-[9px] text-slate-400 block uppercase font-bold">Type of Accident</span>
-                                    <span class="text-xs font-semibold text-slate-800 inline-flex items-center mt-1">
-                                        <i data-lucide="alert-triangle" class="w-3.5 h-3.5 mr-1 text-slate-500"></i> ${found.typeOfAccident || '-'}
-                                    </span>
-                                </div>
-                                <div>
-                                    <span class="text-[9px] text-slate-400 block uppercase font-bold">Injury Status</span>
-                                    <span class="text-xs font-semibold text-slate-800 inline-flex items-center mt-1">
-                                        <i data-lucide="heart" class="w-3.5 h-3.5 mr-1 text-slate-500"></i> ${getRowValue(upd, ['injury', 'Injury']) || 'Not Injured'}
-                                    </span>
-                                </div>
-                                <div>
-                                    <span class="text-[9px] text-slate-400 block uppercase font-bold">Damage Status</span>
-                                    <span class="text-xs font-semibold text-slate-800 inline-flex items-center mt-1">
-                                        <i data-lucide="package" class="w-3.5 h-3.5 mr-1 text-slate-500"></i> ${getRowValue(upd, ['Damage', 'damage']) || 'Damaged'}
-                                    </span>
-                                </div>
-                                <div>
-                                    <span class="text-[9px] text-slate-400 block uppercase font-bold">Severity Level</span>
-                                    <span class="text-xs font-semibold text-rose-600 inline-flex items-center mt-1">
-                                        <i data-lucide="shield-alert" class="w-3.5 h-3.5 mr-1 text-rose-500"></i> ${found.severity || 'Medium'}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="bg-rose-50/40 p-4 rounded-xl border border-rose-100">
-                                <b class="text-rose-900 text-xs block mb-1">สรุปเหตุการณ์ / Incident Summary:</b>
-                                <p class="text-slate-700 text-xs leading-relaxed whitespace-pre-wrap">${details}</p>
-                            </div>
-
-                            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 flex items-center justify-between">
-                                <div class="flex items-center space-x-2">
-                                    <div class="p-1.5 bg-slate-100 text-slate-600 rounded-lg"><i data-lucide="user" class="w-4 h-4"></i></div>
-                                    <div>
-                                        <span class="text-[9px] font-bold text-slate-400 uppercase block">ผู้รายงาน / Reporter</span>
-                                        <span class="text-xs font-extrabold text-slate-700">${reporterVal}</span>
-                                    </div>
-                                </div>
-                                <div class="text-right text-[10px] text-slate-400 font-medium">วันที่ส่งรายงาน/Report date: ${getRowValue(upd, ['Report issue date']) || '-'}</div>
-                            </div>
-                        </div>`;
-                } else if (lowerStatus.includes('second') || lowerStatus.includes('progress')) {
-                    const picVal = getRowValue(upd, ['Person Incharge', 'Person Incharge (ผู้รับผิดชอบ):', 'Person in charge', 'PIC', 'Incharge', 'Liability']) || '-';
-                    cardHtml = `
-                        <div class="bg-white border border-slate-200 rounded-xl p-5 mb-3 space-y-4 shadow-sm">
-                            <div class="flex justify-between font-bold text-slate-700 border-b pb-2">
-                                <span class="flex items-center"><i data-lucide="activity" class="w-4 h-4 mr-1.5 text-slate-600"></i>▸ ${status.toUpperCase()}</span>
-                                <span class="text-slate-400 text-xs font-medium">Date: ${date}</span>
-                            </div>
-                            
-                            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 flex items-center space-x-3 text-xs">
-                                <div class="p-2 bg-slate-100 text-slate-600 rounded-lg"><i data-lucide="user-check" class="w-4.5 h-4.5"></i></div>
-                                <div>
-                                    <span class="text-[9px] font-bold text-slate-400 block uppercase tracking-wider">Person Incharge (ผู้รับผิดชอบ)</span>
-                                    <span class="text-xs font-extrabold text-slate-800">${picVal}</span>
-                                </div>
-                            </div>
-
-                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                                <h5 class="text-xs font-bold text-slate-950 uppercase tracking-wider mb-1.5">Root Cause Analysis (RCA) & Corrective and Preventive Action</h5>
-                                <p class="text-slate-700 text-xs whitespace-pre-wrap leading-relaxed">${details}</p>
-                            </div>
-                        </div>`;
-                } else if (lowerStatus.includes('third')) {
-                    cardHtml = `
-                        <div class="bg-white border border-slate-200 rounded-xl p-5 mb-3 space-y-3 shadow-sm">
-                            <div class="flex justify-between font-bold text-slate-700 border-b pb-2">
-                                <span class="flex items-center"><i data-lucide="file-text" class="w-4 h-4 mr-1.5 text-slate-600"></i>▸ ${status.toUpperCase()}</span>
-                                <span class="text-slate-400 text-xs font-medium">Date: ${date}</span>
-                            </div>
-                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                                <b class="text-slate-900 text-xs block mb-1">Detail Update:</b>
-                                <p class="text-slate-700 text-xs leading-relaxed whitespace-pre-wrap">${details}</p>
-                            </div>
-                        </div>`;
-                } else {
-                    cardHtml = `
-                        <div class="bg-white border border-slate-200 rounded-xl p-5 mb-3 shadow-sm">
-                            <div class="flex justify-between font-bold text-slate-800 border-b pb-2 mb-2">
-                                <span class="flex items-center"><i data-lucide="check-circle-2" class="w-4 h-4 mr-1.5 text-slate-600"></i>✔ ${status.toUpperCase()} (CLOSE เคสสมบูรณ์)</span>
-                                <span class="text-slate-400 text-xs font-medium">Date: ${date}</span>
-                            </div>
-                            <p class="text-slate-700 text-xs leading-relaxed whitespace-pre-wrap bg-slate-50 p-4 rounded-xl border border-slate-200">${details}</p>
-                        </div>`;
-                }
-                container.innerHTML += cardHtml;
-            });
-
-            document.getElementById('detailModal').classList.remove('hidden');
-            lucide.createIcons();
-        }
-
-        function closeModal() { document.getElementById('detailModal').classList.add('hidden'); }
-
-        function exportCaseToWord() {
-            if (!activeCaseScope) return;
-            const c = activeCaseScope;
-            
-            let timelineHtml = '';
-            c.rawUpdates.forEach(upd => {
-                const status = getRowValue(upd, ['Progress Status']);
-                const lowerStatus = status.toLowerCase();
-                const details = getRowValue(upd, ['Details of accident', 'Details of classification', 'Details']) || '-';
-                const date = getRowValue(upd, ['Progress date', 'Report issue date']) || '-';
-
-                if (lowerStatus.includes('first')) {
-                    const placeVal = getRowValue(upd, ['Occurrence area (base)', 'Base', 'Area', 'Place of accident']) || '-';
-                    const severityVal = c.severity || getRowValue(upd, ['Incident Severity Level', 'Severity']) || 'Medium';
-                    
-                    timelineHtml += `
-                        <h3 style="color:#1e293b; font-size:14px; border-bottom:1px solid #e2e8f0; padding-bottom:4px; margin-top:20px;">● ${status} (Action Date: ${date})</h3>
-                        <table style="width:100%; border-collapse:collapse; margin-bottom:15px; font-size:11px;">
-                            <tr>
-                                <td style="border:1px solid #cbd5e1; padding:6px; background-color:#f1f5f9; font-weight:bold; width:25%;">Section</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px; width:25%;">${c.section || '-'}</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px; background-color:#f1f5f9; font-weight:bold; width:25%;">วันที่เกิดเหตุ / Date</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px; width:25%;">${c.dateOfOccurrence || '-'}</td>
-                            </tr>
-                            <tr>
-                                <td style="border:1px solid #cbd5e1; padding:6px; background-color:#f1f5f9; font-weight:bold;">1st QB Received Date</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px; font-weight:bold; color:#1e293b;">${c.qbReceivedDate || '-'}</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px; background-color:#f1f5f9; font-weight:bold;">วันที่ส่งรายงาน / Report Date</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px;">${getRowValue(upd, ['Report issue date']) || '-'}</td>
-                            </tr>
-                            <tr>
-                                <td style="border:1px solid #cbd5e1; padding:6px; background-color:#f1f5f9; font-weight:bold;">สถานที่เกิดเหตุ / Occurrence Area</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px;">${placeVal}</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px; background-color:#f1f5f9; font-weight:bold;">ประเภทเหตุการณ์ / Type</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px;">${c.typeOfAccident || '-'}</td>
-                            </tr>
-                            <tr>
-                                <td style="border:1px solid #cbd5e1; padding:6px; background-color:#f1f5f9; font-weight:bold;">Sub contract name</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px;">${c.subContractName || '-'}</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px; background-color:#f1f5f9; font-weight:bold;">ระดับความรุนแรง / Severity</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px; font-weight:bold; color:#e11d48;">${severityVal}</td>
-                            </tr>
-                        </table>
-                        <p style="font-size:11px; margin-bottom:4px;"><b>สรุปเหตุการณ์ / Incident Summary:</b></p>
-                        <blockquote style="background-color:#fafafa; border-left:3px solid #cbd5e1; padding:8px; margin:0 0 10px 0; font-size:11px; line-height:1.4;">${details}</blockquote>
-                    `;
-                } else {
-                    timelineHtml += `
-                        <h3 style="color:#1e293b; font-size:14px; border-bottom:1px solid #e2e8f0; padding-bottom:4px; margin-top:20px;">● ${status} (CASE CLOSED - Date: ${date})</h3>
-                        <blockquote style="background-color:#fafafa; border-left:3px solid #64748b; padding:10px; margin:0 0 20px 0; font-size:11px; line-height:1.4;">${details}</blockquote>
-                    `;
-                }
-            });
-
-            const docContent = `
-                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-                <head><meta charset="utf-8"><title>Case Profile</title>
-                <style>
-                    body { font-family: Arial, sans-serif; color: #334155; line-height: 1.4; font-size: 11px; }
-                    h2 { color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; font-size: 16px; margin-bottom: 5px; }
-                </style>
-                </head>
-                <body>
-                    <h2>"K" LINE LOGISTICS (THAILAND) LTD.</h2>
-                    <p style="font-size:12px; color:#64748b; margin-top:0;"><b>Accident & Nonconformity Official Sheet - Code: ${c.reportNo}</b></p>
-                    <table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:11px;">
-                        <tr>
-                            <td style="border:1px solid #cbd5e1; padding:8px; background-color:#f1f5f9; font-weight:bold; width:25%;">Customer Name</td>
-                            <td style="border:1px solid #cbd5e1; padding:8px; width:25%;">${c.customerName}</td>
-                            <td style="border:1px solid #cbd5e1; padding:8px; background-color:#f1f5f9; font-weight:bold; width:25%;">Date of Occurrence</td>
-                            <td style="border:1px solid #cbd5e1; padding:8px; width:25%;">${c.dateOfOccurrence}</td>
-                        </tr>
-                    </table>
-
-                    <h3 style="color:#1e293b; font-size:14px; border-bottom:1px solid #e2e8f0; padding-bottom:4px; margin-top:15px;">● Job Financial Performance (ผลการดำเนินงานทางการเงิน)</h3>
-                    <table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:11px;">
-                        <tr style="background-color:#f8fafc;">
-                            <td style="border:1px solid #cbd5e1; padding:6px; font-weight:bold;">REVENUE (รายได้)</td>
-                            <td style="border:1px solid #cbd5e1; padding:6px; text-align:right; font-weight:bold; color:#065f46;">฿${formatNumber(c.revenue || 0)}</td>
-                            <td style="border:1px solid #cbd5e1; padding:6px; font-weight:bold;">COST (ต้นทุน)</td>
-                            <td style="border:1px solid #cbd5e1; padding:6px; text-align:right; font-weight:bold;">฿${formatNumber(c.cost || 0)}</td>
-                        </tr>
-                        <tr style="background-color:#f8fafc;">
-                            <td style="border:1px solid #cbd5e1; padding:6px; font-weight:bold;">TRANSPORTATION (ค่าขนส่ง)</td>
-                            <td style="border:1px solid #cbd5e1; padding:6px; text-align:right; font-weight:bold; color:#0369a1;">฿${formatNumber(c.transportation || 0)}</td>
-                            <td style="border:1px solid #cbd5e1; padding:6px; font-weight:bold;">PROFIT (กำไรสุทธิ)</td>
-                            <td style="border:1px solid #cbd5e1; padding:6px; text-align:right; font-weight:bold; color:#0f766e;">฿${formatNumber(c.profit || 0)}</td>
-                        </tr>
-                    </table>
-
-                    ${timelineHtml}
-                    <h3 style="color:#1e293b; font-size:14px; border-bottom:1px solid #e2e8f0; padding-bottom:4px; margin-top:25px;">● Financial & Expense Breakdown (ตารางสรุปรายละเอียดค่าเสียหาย/ค่าปรับ/ประกัน)</h3>
-                    <table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:11px;">
-                        <thead>
-                            <tr style="background-color:#ffe4e6; color:#881337;">
-                                <th style="border:1px solid #cbd5e1; padding:6px; text-align:left;">Financial Item (รายการทางการเงิน)</th>
-                                <th style="border:1px solid #cbd5e1; padding:6px; text-align:right;">Amount (จำนวนเงิน)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td style="border:1px solid #cbd5e1; padding:6px;">Revenue (รายได้บริการ - REVENUE)</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px; text-align:right; font-weight:bold; color:#065f46;">฿${formatNumber(c.revenue || 0)}</td>
-                            </tr>
-                            <tr>
-                                <td style="border:1px solid #cbd5e1; padding:6px;">Operating Cost (ต้นทุนการดำเนินงาน - COST)</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px; text-align:right; font-weight:bold;">฿${formatNumber(c.cost || 0)}</td>
-                            </tr>
-                            <tr>
-                                <td style="border:1px solid #cbd5e1; padding:6px;">Transportation Cost (ค่าขนส่ง - TRANSPORTATION)</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px; text-align:right; font-weight:bold; color:#0369a1;">฿${formatNumber(c.transportation || 0)}</td>
-                            </tr>
-                            <tr>
-                                <td style="border:1px solid #cbd5e1; padding:6px;">Net Profit (กำไร/ขาดทุนสุทธิ - PROFIT)</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px; text-align:right; font-weight:bold; color:#0f766e;">฿${formatNumber(c.profit || 0)}</td>
-                            </tr>
-                            <tr>
-                                <td style="border:1px solid #cbd5e1; padding:6px;">Total Claim (ความเสียหายรวมสินค้า)</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px; text-align:right; font-weight:bold; color:#be123c;">฿${formatNumber(c.totalClaim || 0)}</td>
-                            </tr>
-                            <tr>
-                                <td style="border:1px solid #cbd5e1; padding:6px;">Claim under consideration (ยอดอยู่ระหว่างพิจารณา)</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px; text-align:right; font-weight:bold; color:#c2410c;">฿${formatNumber(c.claimUnderConsideration || 0)}</td>
-                            </tr>
-                            <tr>
-                                <td style="border:1px solid #cbd5e1; padding:6px;">KLL's Insurance (ประกันชดเชยฝั่ง KLL)</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px; text-align:right; font-weight:bold;">฿${formatNumber(c.kllInsurance || 0)}</td>
-                            </tr>
-                            <tr>
-                                <td style="border:1px solid #cbd5e1; padding:6px;">Customer's Insurance (ประกันชดเชยฝั่งลูกค้า)</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px; text-align:right; font-weight:bold; color:#be185d;">฿${formatNumber(c.custInsurance || 0)}</td>
-                            </tr>
-                            <tr>
-                                <td style="border:1px solid #cbd5e1; padding:6px;">Sub's Insurance (ประกันชดเชยฝั่ง Sub)</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px; text-align:right; font-weight:bold;">฿${formatNumber(c.subInsurance || 0)}</td>
-                            </tr>
-                            <tr>
-                                <td style="border:1px solid #cbd5e1; padding:6px;">Fine by Customer (ยอดค่าปรับเรียกเก็บลูกค้า)</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px; text-align:right; font-weight:bold;">฿${formatNumber(c.fineByCustomer || 0)}</td>
-                            </tr>
-                            <tr>
-                                <td style="border:1px solid #cbd5e1; padding:6px;">Fine by KLL (ส่วน KLL รับผิดชอบเอง)</td>
-                                <td style="border:1px solid #cbd5e1; padding:6px; text-align:right; font-weight:bold; color:#9f1239;">฿${formatNumber(c.fineByKll || 0)}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </body>
-                </html>`;
-
-            const blob = new Blob(['\ufeff' + docContent], { type: 'application/msword;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `KLine_Report_${c.reportNo}.doc`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            showNotification("ส่งออกรายงานประวัติเคสแบบ Word สำเร็จ!");
-        }
-
-        function clearAllFilters() {
-            document.getElementById('filterSubcontractor').value = "";
-            document.getElementById('filterCustomer').value = "";
-            document.getElementById('filterBase').value = "";
-            document.getElementById('filterSection').value = "";
-            document.getElementById('filterAccidentType').value = "";
-            document.getElementById('filterLiability').value = "";
-            document.getElementById('tableSearch').value = "";
-            selectedYearFilter = null;
-            selectedSeverityFilter = null;
             selectedStatusFilter = null;
-            selectedFinancialFilter = null;
+            selectedSeverityFilter = null;
+            selectedSlaFilter = null;
             currentPage = 1;
             applyFiltersAndRender();
-        }
-
-        function showNotification(msg) {
-            const banner = document.getElementById('statusNotification');
-            document.getElementById('notificationMessage').innerText = msg;
-            banner.classList.remove('hidden');
-            setTimeout(() => { banner.classList.add('hidden'); }, 6000);
         }
 
         function closeNotification() { document.getElementById('statusNotification').classList.add('hidden'); }
 
-        function exportFilteredDataToCsv() {
-            if (filteredCases.length === 0) return;
-            const exportRows = [];
-            filteredCases.forEach(c => c.rawUpdates.forEach(row => exportRows.push(row)));
-            const csv = Papa.unparse(exportRows);
-            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.setAttribute("href", URL.createObjectURL(blob));
-            link.setAttribute("download", `KLine_Filtered_Report.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        function applyFiltersAndRender() {
+            refreshLinkedFilterOptions(false);
+            filteredCases = consolidatedCases.filter(c => matchesFilter(c, false));
+            renderKpisAndFinCards();
+            renderTrendChart();
+            renderPieCharts();
+            renderTable();
+        }
+
+        function toggleSlaFilter(st) { selectedSlaFilter = (selectedSlaFilter === st) ? null : st; applyFiltersAndRender(); }
+        function toggleStatusFilter(st) { selectedStatusFilter = (selectedStatusFilter === st) ? null : st; applyFiltersAndRender(); }
+        function toggleSeverityFilter(sv) { selectedSeverityFilter = (selectedSeverityFilter === sv) ? null : sv; applyFiltersAndRender(); }
+
+        function renderKpisAndFinCards() {
+            document.getElementById('kpiTotalCases').innerText = filteredCases.length;
+            let active = 0, closed = 0, sH = 0, sM = 0, sL = 0;
+            let sOnProc = 0, sOver = 0, sComp = 0;
+            let ft=0, fu=0, fki=0, fci=0, fsi=0, ffc=0, ffk=0;
+
+            filteredCases.forEach(c => {
+                if (c.isFinal) closed++; else active++;
+                let sv = (c.severity||'').toLowerCase();
+                if (sv.includes('high')) sH++; else if (sv.includes('low')) sL++; else sM++;
+
+                if (c.slaStatus === 'completed') sComp++;
+                else if (c.slaStatus === 'on_process') sOnProc++;
+                else if (c.slaStatus === 'overdue') sOver++;
+
+                ft += c.totalClaim; fu += c.claimUnderCons;
+                fki += c.kllIns; fci += c.custIns; fsi += c.subIns;
+                ffc += c.fineCust; ffk += c.fineKll;
+            });
+
+            document.getElementById('kpiOpenCases').innerText = active;
+            document.getElementById('kpiClosedCases').innerText = closed;
+            document.getElementById('kpiSevHigh').innerText = sH;
+            document.getElementById('kpiSevMed').innerText = sM;
+            document.getElementById('kpiSevLow').innerText = sL;
+
+            document.getElementById('card_status_active').classList.toggle('ring-2', selectedStatusFilter==='active');
+            document.getElementById('card_status_closed').classList.toggle('ring-2', selectedStatusFilter==='closed');
+            document.getElementById('card_sev_high').classList.toggle('ring-2', selectedSeverityFilter==='High');
+            document.getElementById('card_sev_med').classList.toggle('ring-2', selectedSeverityFilter==='Medium');
+            document.getElementById('card_sev_low').classList.toggle('ring-2', selectedSeverityFilter==='Low');
+
+            document.getElementById('card_sla_on_process').classList.toggle('ring-2', selectedSlaFilter === 'on_process');
+            document.getElementById('card_sla_on_process').classList.toggle('ring-sky-500', selectedSlaFilter === 'on_process');
+            
+            document.getElementById('card_sla_overdue').classList.toggle('ring-2', selectedSlaFilter === 'overdue');
+            document.getElementById('card_sla_overdue').classList.toggle('ring-rose-500', selectedSlaFilter === 'overdue');
+            
+            document.getElementById('card_sla_completed').classList.toggle('ring-2', selectedSlaFilter === 'completed');
+            document.getElementById('card_sla_completed').classList.toggle('ring-emerald-500', selectedSlaFilter === 'completed');
+
+            document.getElementById('finTotalClaims').innerText = '฿' + formatNumber(ft);
+            document.getElementById('finUnderConsideration').innerText = '฿' + formatNumber(fu);
+            document.getElementById('finKllInsurance').innerText = '฿' + formatNumber(fki);
+            document.getElementById('finCustInsurance').innerText = '฿' + formatNumber(fci);
+            document.getElementById('finSubInsurance').innerText = '฿' + formatNumber(fsi);
+            document.getElementById('finFineCustomer').innerText = '฿' + formatNumber(ffc);
+            document.getElementById('finFineKll').innerText = '฿' + formatNumber(ffk);
+
+            document.getElementById('slaPendingCount').innerText = sOnProc;
+            document.getElementById('slaOverdueCount').innerText = sOver;
+            document.getElementById('slaCompletedCount').innerText = sComp;
+        }
+
+        function renderTrendChart() {
+            let mMap = {};
+            const tempFiltered = consolidatedCases.filter(c => matchesFilter(c, true)); // ignore Month Filter for chart
+            
+            // Always use QB Received Date for the trend chart.
+            tempFiltered.forEach(c => {
+                let ym = getYearMonth(c.qbReceivedDate);
+                if (ym) mMap[ym] = (mMap[ym] || 0) + 1;
+            });
+
+            let labels = Object.keys(mMap).sort();
+            let data = labels.map(l => mMap[l]);
+            let selectedMonth = document.getElementById('filterMonthSelect') ? document.getElementById('filterMonthSelect').value : '';
+
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            let displayLabels = labels.map(l => {
+                let parts = l.split('-');
+                if (parts.length === 2) return `${monthNames[parseInt(parts[1])-1]}-${parts[0].slice(-2)}`;
+                return l;
+            });
+
+            let pointRadii = labels.map(l => (selectedMonth && l.split('-')[1] === selectedMonth) ? 8 : 4);
+            let pointColors = labels.map(l => (selectedMonth && l.split('-')[1] === selectedMonth) ? '#9f1239' : '#e11d48');
+
+            if (trendChart) trendChart.destroy();
+            trendChart = new Chart(document.getElementById('monthlyTrendChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: displayLabels,
+                    datasets: [{
+                        label: 'Cases',
+                        data: data,
+                        borderColor: '#f43f5e',
+                        backgroundColor: '#ffe4e6',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: pointColors,
+                        pointRadius: pointRadii,
+                        pointHoverRadius: 10
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    layout: { padding: { left: 10, right: 10 } },
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { offset: true } },
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 10, color: '#0f172a', padding: 4, font: { size: 9, weight: 'bold' },
+                            formatter: (val) => val > 0 ? `${val} เคส` : '',
+                            display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0
+                        }
+                    },
+                    onClick: (evt, activeElements) => {
+                        if (activeElements.length > 0) {
+                            const index = activeElements[0].index;
+                            const fullYm = labels[index]; 
+                            const clickedMonth = fullYm.split('-')[1];
+                            const el = document.getElementById('filterMonthSelect');
+                            const basisEl = document.getElementById('filterMonthBasis');
+                            if (basisEl) basisEl.value = 'qb';
+                            if (el) {
+                                el.value = (el.value === clickedMonth) ? '' : clickedMonth;
+                                currentPage = 1;
+                                applyFiltersAndRender();
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderPieCharts() {
+            let typeMap = {}, secMap = {};
+            filteredCases.forEach(c => {
+                let t = c.typeOfAccident || 'Unknown';
+                let s = c.section || 'Unknown';
+                typeMap[t] = (typeMap[t] || 0) + 1;
+                secMap[s] = (secMap[s] || 0) + 1;
+            });
+
+            let pal = ['#f87171', '#94a3b8', '#fb7185', '#64748b', '#f472b6', '#cbd5e1', '#fda4af'];
+
+            const commonOptions = {
+                responsive: true, maintainAspectRatio: false, cutout: '50%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } },
+                    datalabels: {
+                        backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 10, color: '#0f172a', padding: 4, font: { size: 9, weight: 'bold' },
+                        formatter: (val, ctx) => [`${val} เคส`],
+                        display: (ctx) => {
+                            let total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+                            return (ctx.dataset.data[ctx.dataIndex] / total) > 0.05;
+                        }
+                    }
+                }
+            };
+
+            if (myPieChart) myPieChart.destroy();
+            myPieChart = new Chart(document.getElementById('accidentTypePieChart').getContext('2d'), {
+                type: 'doughnut',
+                data: { labels: Object.keys(typeMap), datasets: [{ data: Object.values(typeMap), backgroundColor: pal }] },
+                options: commonOptions
+            });
+
+            if (mySectionPieChart) mySectionPieChart.destroy();
+            mySectionPieChart = new Chart(document.getElementById('sectionPieChart').getContext('2d'), {
+                type: 'doughnut',
+                data: { labels: Object.keys(secMap), datasets: [{ data: Object.values(secMap), backgroundColor: [...pal].reverse() }] },
+                options: commonOptions
+            });
+        }
+
+        function renderTable() {
+            const tb = document.getElementById('casesTableBody');
+            tb.innerHTML = '';
+            let tot = filteredCases.length;
+            if (tot === 0) { tb.innerHTML = `<tr><td colspan="12" class="text-center py-6 text-slate-400">No records found.</td></tr>`; return; }
+
+            let start = (currentPage - 1) * itemsPerPage;
+            let paged = filteredCases.slice(start, start + itemsPerPage);
+
+            paged.forEach(c => {
+                let tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+
+                let slaBadge = `<span class="text-slate-400">-</span>`;
+                if (c.qbReceivedDate) {
+                    if (c.slaStatus === 'completed') {
+                        slaBadge = `<span class="px-2 py-0.5 rounded-md text-[9px] bg-emerald-100 text-emerald-800 font-bold border border-emerald-200">Completed (${c.slaDaysElapsed}d)</span>`;
+                    } else if (c.slaStatus === 'on_process') {
+                        slaBadge = `<span class="px-2 py-0.5 rounded-md text-[9px] bg-sky-100 text-sky-800 font-bold border border-sky-200">On process (${c.slaDaysElapsed}d)</span>`;
+                    } else if (c.slaStatus === 'overdue') {
+                        slaBadge = `<span class="px-2 py-0.5 rounded-md text-[9px] bg-rose-100 text-rose-800 font-bold border border-rose-300 animate-pulse-slow">Overdue (${c.slaDaysElapsed}d)</span>`;
+                    } else {
+                        slaBadge = `<span class="px-2 py-0.5 rounded-md text-[9px] bg-amber-100 text-amber-800 font-bold border border-amber-200">${3 - c.slaDaysElapsed}d left</span>`;
+                    }
+                }
+
+                let stCls = c.isFinal ? 'bg-slate-700 text-white' : (c.isStage2Or3 ? 'bg-slate-200 text-slate-800' : 'bg-rose-100 text-rose-800');
+                let claimH = c.totalClaim > 0 ? `<div class="font-bold text-rose-700">Claim: ฿${formatNumber(c.totalClaim)}</div>` : '';
+                let fineH = c.fineKll > 0 ? `<div class="font-bold text-rose-900">Fine: ฿${formatNumber(c.fineKll)}</div>` : '';
+                let revH = c.rev > 0 ? `<div class="font-bold text-emerald-700">Rev: ฿${formatNumber(c.rev)}</div>` : '';
+                let profColor = c.profit >= 0 ? 'text-emerald-800' : 'text-rose-700';
+                let profH = c.profit !== 0 ? `<div class="font-black ${profColor}">Pft: ฿${formatNumber(c.profit)}</div>` : '';
+
+                tr.innerHTML = `
+                    <td class="py-2.5 px-2 font-bold text-slate-800 whitespace-nowrap">${c.reportNo}</td>
+                    <td class="py-2.5 px-2"><div class="line-clamp-2 w-28 font-medium" title="${c.customerName}">${c.customerName || '-'}</div></td>
+                    <td class="py-2.5 px-2 bg-rose-50/50 border-l border-rose-100">${claimH}${fineH}</td>
+                    <td class="py-2.5 px-2 bg-emerald-50/50 border-r border-emerald-100">${revH}${profH}</td>
+                    <td class="py-2.5 px-2 font-black text-slate-700 bg-slate-100/50 whitespace-nowrap">${c.qbReceivedDate || '-'}</td>
+                    <td class="py-2.5 px-2"><span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase ${stCls}">${c.latestStatus}</span></td>
+                    <td class="py-2.5 px-2 text-center whitespace-nowrap">${slaBadge}</td>
+                    <td class="py-2.5 px-2"><span class="px-1.5 py-0.5 rounded bg-slate-200 text-slate-800 text-[9px] font-bold">${c.caseDecision || '-'}</span></td>
+                    <td class="py-2.5 px-2">${c.section || '-'}</td>
+                    <td class="py-2.5 px-2"><div class="line-clamp-2 w-20">${c.typeOfAccident || '-'}</div></td>
+                    <td class="py-2.5 px-2 font-bold ${c.severity==='High'?'text-rose-600':''}">${c.severity}</td>
+                    <td class="py-2.5 px-2"><div class="line-clamp-2 min-w-[120px] max-w-[200px] text-slate-500 text-[9px] break-words">${c.note || '-'}</div></td>
+                `;
+                tb.appendChild(tr);
+            });
+
+            document.getElementById('tableRecordCount').innerText = `Showing ${start + 1} to ${Math.min(start + itemsPerPage, tot)} of ${tot} cases`;
+            let pages = Math.ceil(tot / itemsPerPage);
+            let pCtrl = document.getElementById('paginationControls');
+            pCtrl.innerHTML = '';
+            for(let i=1; i<=pages; i++) {
+                pCtrl.innerHTML += `<button onclick="currentPage=${i}; renderTable();" class="px-2 py-1 text-xs font-bold rounded ${i===currentPage ? 'bg-slate-700 text-white' : 'border bg-white hover:bg-slate-50'}">${i}</button>`;
+            }
         }
     </script>
 </body>
