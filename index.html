@@ -311,6 +311,7 @@
                             <th class="py-2.5 px-2">Type</th>
                             <th class="py-2.5 px-2">Severity</th>
                             <th class="py-2.5 px-2 text-slate-400 font-normal max-w-[200px]">Note</th>
+                            <th class="py-2.5 px-2 text-center">View</th>
                         </tr>
                     </thead>
                     <tbody id="casesTableBody" class="text-[10px] sm:text-xs divide-y divide-slate-100 text-slate-600"></tbody>
@@ -323,6 +324,22 @@
             </div>
         </section>
     </main>
+
+    <!-- Case Detail Modal -->
+    <div id="caseViewModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/55 p-4" onclick="if(event.target===this) closeCaseView()">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden border border-slate-200">
+            <div class="px-5 py-4 bg-slate-800 text-white flex items-center justify-between">
+                <div>
+                    <div class="text-[10px] uppercase tracking-wider text-slate-300 font-bold">Case detail</div>
+                    <h3 id="caseViewTitle" class="text-lg font-black">Case</h3>
+                </div>
+                <button type="button" onclick="closeCaseView()" class="p-2 rounded-lg hover:bg-slate-700 transition" aria-label="Close case detail">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="caseViewContent" class="p-5 overflow-y-auto custom-scrollbar max-h-[calc(90vh-72px)] bg-slate-50"></div>
+        </div>
+    </div>
 
     <script>
         const DEFAULT_DATASET = [
@@ -521,6 +538,17 @@
                         subContractName: getRowValue(row, ['Sub contract name', 'Subcontractor']),
                         note: getRowValue(row, ['Note', 'หมายเหตุ', 'Remark']),
                         caseDecision: getRowValue(row, ['Case Decision', 'Case decision', 'Decision']),
+                        reportIssueDate: getRowValue(row, ['Report issue date']),
+                        injury: getRowValue(row, ['injury', 'Injury']),
+                        damage: getRowValue(row, ['Damage', 'damage']),
+                        classificationSecond: getRowValue(row, ['Classification  for second report ', 'Classification for second report']),
+                        firstReport: getRowValue(row, ['First Report', 'First Report ']),
+                        secondReport: getRowValue(row, ['Second Report', 'Second Report ']),
+                        thirdReport: getRowValue(row, ['Third Report ', 'Third Report']),
+                        finalReport: getRowValue(row, ['Final Report', 'Final Report ']),
+                        personIncharge: getRowValue(row, ['Person Incharge', 'Person In Charge']),
+                        reporter: getRowValue(row, ['Reporter']),
+                        followUpDate: getRowValue(row, ['Date Follow-up', 'Date Follow up']),
                         totalClaim: parseCurrency(getRowValue(row, ['Total claim'])),
                         claimUnderCons: parseCurrency(getRowValue(row, ['Claim under consideration'])),
                         kllIns: parseCurrency(getRowValue(row, ["KLL's insurance"])),
@@ -535,6 +563,26 @@
                         stagesList: []
                     };
                 }
+
+                // Preserve/refresh non-empty details when the same Report No. appears on multiple CSV rows
+                const detailUpdates = {
+                    reportIssueDate: ['Report issue date'],
+                    injury: ['injury', 'Injury'],
+                    damage: ['Damage', 'damage'],
+                    classificationSecond: ['Classification  for second report ', 'Classification for second report'],
+                    firstReport: ['First Report', 'First Report '],
+                    secondReport: ['Second Report', 'Second Report '],
+                    thirdReport: ['Third Report ', 'Third Report'],
+                    finalReport: ['Final Report', 'Final Report '],
+                    personIncharge: ['Person Incharge', 'Person In Charge'],
+                    reporter: ['Reporter'],
+                    followUpDate: ['Date Follow-up', 'Date Follow up'],
+                    note: ['Note', 'หมายเหตุ', 'Remark']
+                };
+                Object.entries(detailUpdates).forEach(([prop, keys]) => {
+                    const v = getRowValue(row, keys);
+                    if (v) casesMap[rNo][prop] = v;
+                });
 
                 ['First', 'Second', 'Third', 'Final'].forEach(st => {
                     let text = getRowValue(row, [st + ' Report', st + ' Report ', st]);
@@ -891,11 +939,129 @@
             });
         }
 
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function detailValue(value) {
+            const v = String(value ?? '').trim();
+            return v ? escapeHtml(v) : '<span class="text-slate-400">-</span>';
+        }
+
+        function moneyValue(value) {
+            return `฿${formatNumber(Number(value) || 0)}`;
+        }
+
+        function openCaseView(reportNo) {
+            const c = consolidatedCases.find(x => x.reportNo === reportNo);
+            if (!c) return;
+
+            document.getElementById('caseViewTitle').textContent = c.reportNo || 'Case detail';
+            const statusText = c.isFinal ? 'Final / Closed' : c.latestStatus || 'Open';
+            const statusClass = c.isFinal ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800';
+
+            const field = (label, value) => `
+                <div class="bg-white border border-slate-200 rounded-xl p-3 min-w-0">
+                    <div class="text-[9px] uppercase tracking-wider font-bold text-slate-400 mb-1">${label}</div>
+                    <div class="text-xs font-semibold text-slate-800 break-words">${detailValue(value)}</div>
+                </div>`;
+
+            const reportBlock = (title, text, tone='slate') => `
+                <div class="bg-white border border-${tone}-200 rounded-xl overflow-hidden">
+                    <div class="px-3 py-2 bg-${tone}-50 border-b border-${tone}-100 text-[10px] uppercase tracking-wider font-black text-${tone}-700">${title}</div>
+                    <div class="p-3 text-xs leading-relaxed text-slate-700 whitespace-pre-wrap break-words">${detailValue(text)}</div>
+                </div>`;
+
+            document.getElementById('caseViewContent').innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex flex-wrap gap-2 items-center">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-black ${statusClass}">${escapeHtml(statusText)}</span>
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-200 text-slate-700">${detailValue(c.caseDecision)}</span>
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Severity: ${detailValue(c.severity)}</span>
+                    </div>
+
+                    <section>
+                        <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider mb-2">Case information</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                            ${field('Customer / Sub name', c.customerName)}
+                            ${field('Subcontractor', c.subContractName)}
+                            ${field('Occurrence date', c.dateOfOccurrence)}
+                            ${field('1st QB received', c.qbReceivedDate)}
+                            ${field('Report issue date', c.reportIssueDate)}
+                            ${field('Progress date', c.progressDate)}
+                            ${field('Follow-up date', c.followUpDate)}
+                            ${field('Occurrence area', c.base)}
+                            ${field('Section', c.section)}
+                            ${field('Type of accident', c.typeOfAccident)}
+                            ${field('Liability', c.liability)}
+                            ${field('Classification (2nd)', c.classificationSecond)}
+                            ${field('Injury', c.injury)}
+                            ${field('Damage', c.damage)}
+                            ${field('Person in charge', c.personIncharge)}
+                            ${field('Reporter', c.reporter)}
+                        </div>
+                    </section>
+
+                    <section>
+                        <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider mb-2">Financial summary</h4>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                            ${field('Total claim', moneyValue(c.totalClaim))}
+                            ${field('Claim under consideration', moneyValue(c.claimUnderCons))}
+                            ${field("KLL's insurance", moneyValue(c.kllIns))}
+                            ${field("Customer's insurance", moneyValue(c.custIns))}
+                            ${field("Sub's insurance", moneyValue(c.subIns))}
+                            ${field('Fine by KLL', moneyValue(c.fineKll))}
+                            ${field('Fine by customer', moneyValue(c.fineCust))}
+                            ${field('Revenue', moneyValue(c.rev))}
+                            ${field('Cost', moneyValue(c.cost))}
+                            ${field('Profit', moneyValue(c.profit))}
+                        </div>
+                    </section>
+
+                    <section>
+                        <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider mb-2">Report progression</h4>
+                        <div class="space-y-3">
+                            ${reportBlock('1st Report', c.firstReport, 'rose')}
+                            ${reportBlock('2nd Report', c.secondReport, 'sky')}
+                            ${reportBlock('3rd Report', c.thirdReport, 'amber')}
+                            ${reportBlock('Final Report', c.finalReport, 'emerald')}
+                        </div>
+                    </section>
+
+                    <section>
+                        <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider mb-2">Note</h4>
+                        <div class="bg-white border border-slate-200 rounded-xl p-3 text-xs leading-relaxed text-slate-700 whitespace-pre-wrap break-words">${detailValue(c.note)}</div>
+                    </section>
+                </div>`;
+
+            const modal = document.getElementById('caseViewModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.classList.add('overflow-hidden');
+            lucide.createIcons();
+        }
+
+        function closeCaseView() {
+            const modal = document.getElementById('caseViewModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeCaseView();
+        });
+
         function renderTable() {
             const tb = document.getElementById('casesTableBody');
             tb.innerHTML = '';
             let tot = filteredCases.length;
-            if (tot === 0) { tb.innerHTML = `<tr><td colspan="12" class="text-center py-6 text-slate-400">No records found.</td></tr>`; return; }
+            if (tot === 0) { tb.innerHTML = `<tr><td colspan="13" class="text-center py-6 text-slate-400">No records found.</td></tr>`; return; }
 
             let start = (currentPage - 1) * itemsPerPage;
             let paged = filteredCases.slice(start, start + itemsPerPage);
@@ -937,10 +1103,16 @@
                     <td class="py-2.5 px-2"><div class="line-clamp-2 w-20">${c.typeOfAccident || '-'}</div></td>
                     <td class="py-2.5 px-2 font-bold ${c.severity==='High'?'text-rose-600':''}">${c.severity}</td>
                     <td class="py-2.5 px-2"><div class="line-clamp-2 min-w-[120px] max-w-[200px] text-slate-500 text-[9px] break-words">${c.note || '-'}</div></td>
+                    <td class="py-2.5 px-2 text-center whitespace-nowrap">
+                        <button type="button" onclick='openCaseView(${JSON.stringify(c.reportNo)})' class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white hover:bg-rose-600 transition text-[10px] font-bold shadow-sm">
+                            <i data-lucide="eye" class="w-3.5 h-3.5"></i><span>View</span>
+                        </button>
+                    </td>
                 `;
                 tb.appendChild(tr);
             });
 
+            lucide.createIcons();
             document.getElementById('tableRecordCount').innerText = `Showing ${start + 1} to ${Math.min(start + itemsPerPage, tot)} of ${tot} cases`;
             let pages = Math.ceil(tot / itemsPerPage);
             let pCtrl = document.getElementById('paginationControls');
