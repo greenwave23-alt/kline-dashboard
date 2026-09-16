@@ -20,6 +20,8 @@
         .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         @keyframes pulse-slow { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .animate-pulse-slow { animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        .final-row { background-color: #f8fafc; opacity: 0.7; }
+        .final-row:hover { background-color: #f1f5f9; opacity: 0.9; }
     </style>
 </head>
 <body class="text-slate-800 font-sans">
@@ -37,7 +39,7 @@
                 <div class="flex items-center space-x-3">
                     <label class="cursor-pointer bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 text-white text-xs font-semibold py-2 px-4 rounded-lg flex flex-col items-center transition shadow-sm border border-rose-400/30">
                         <div class="flex items-center space-x-2"><i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Upload CSV</span></div>
-                        <span class="text-[8px] font-normal text-rose-100">(V16.6 Compatible)</span>
+                        <span class="text-[8px] font-normal text-rose-100">(V18 Compatible)</span>
                         <input type="file" id="csvFileInput" accept=".csv" class="hidden" />
                     </label>
                     <button id="resetButton" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold py-2 px-3 rounded-lg flex flex-col items-center transition border border-slate-600">
@@ -249,7 +251,6 @@
                 </div>
             </div>
 
-            <!-- Trend Chart -->
             <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
                     <h3 id="trendChartTitle" class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center">
@@ -295,12 +296,15 @@
                 </div>
             </div>
 
+            <!-- Wider table to allow horizontal scrolling for all the columns requested -->
             <div class="overflow-x-auto custom-scrollbar">
-                <table class="w-full text-left border-collapse table-auto min-w-[1200px]">
+                <table class="w-full text-left border-collapse table-auto min-w-[1500px]">
                     <thead>
                         <tr class="bg-slate-50 border-b border-slate-100 text-slate-500 text-[9px] uppercase tracking-wider font-extrabold">
                             <th class="py-2.5 px-2">Report No.</th>
                             <th class="py-2.5 px-2">Customer</th>
+                            <!-- Note column moved here -->
+                            <th class="py-2.5 px-2 text-slate-400 font-normal w-[180px]">Note</th>
                             <th class="py-2.5 px-2 bg-rose-50/50 text-rose-800 border-l border-rose-100">Claim / Fine</th>
                             <th class="py-2.5 px-2 bg-emerald-50/50 text-emerald-800 border-r border-emerald-100">Job Financials</th>
                             <th class="py-2.5 px-2 text-slate-800 bg-slate-100/50">1st QB Date</th>
@@ -309,8 +313,11 @@
                             <th class="py-2.5 px-2">Decision</th>
                             <th class="py-2.5 px-2">Section</th>
                             <th class="py-2.5 px-2">Type</th>
+                            <!-- Subcontractor column added here -->
+                            <th class="py-2.5 px-2">Subcontractor</th>
                             <th class="py-2.5 px-2">Severity</th>
-                            <th class="py-2.5 px-2 text-slate-400 font-normal max-w-[200px]">Note</th>
+                            <!-- Follow Up column moved here -->
+                            <th class="py-2.5 px-2">Follow Up</th>
                             <th class="py-2.5 px-2 text-center">View</th>
                         </tr>
                     </thead>
@@ -325,10 +332,9 @@
         </section>
     </main>
 
-    <!-- Case Detail Modal -->
     <div id="caseViewModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/55 p-4" onclick="if(event.target===this) closeCaseView()">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden border border-slate-200">
-            <div class="px-5 py-4 bg-slate-800 text-white flex items-center justify-between">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden border border-slate-200 flex flex-col">
+            <div class="px-5 py-4 bg-slate-800 text-white flex items-center justify-between flex-shrink-0">
                 <div>
                     <div class="text-[10px] uppercase tracking-wider text-slate-300 font-bold">Case detail</div>
                     <h3 id="caseViewTitle" class="text-lg font-black">Case</h3>
@@ -337,7 +343,7 @@
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
-            <div id="caseViewContent" class="p-5 overflow-y-auto custom-scrollbar max-h-[calc(90vh-72px)] bg-slate-50"></div>
+            <div id="caseViewContent" class="p-5 overflow-y-auto custom-scrollbar flex-grow bg-slate-50"></div>
         </div>
     </div>
 
@@ -354,9 +360,12 @@
                 "Type of accident": "Cargo damage",
                 "Incident Severity Level": "High",
                 "Case Decision": "Offensive",
+                "Sub contract name": "Thai Logistics Inc.",
+                "Date Follow-up": "25/08/2026",
                 "Total claim": "45000",
                 "REVENUE": "15000",
                 "PROFIT": "-30000",
+                "Note": "Customer requested expedited review.",
                 "First Report": "Pallet collapsed during forklift unloading.",
                 "Second Report": "Root cause: Defective strapping."
             },
@@ -370,10 +379,13 @@
                 "Type of accident": "Delay in delivery",
                 "Incident Severity Level": "Medium",
                 "Case Decision": "Defensive",
+                "Sub contract name": "Port Authority",
+                "Date Follow-up": "",
                 "Total claim": "0",
                 "Fine by customer": "2000",
                 "REVENUE": "8000",
                 "PROFIT": "6000",
+                "Note": "Traffic congestion near gate.",
                 "First Report": "Container delayed at terminal gate."
             }
         ];
@@ -393,6 +405,7 @@
         let mySectionPieChart = null;
         let trendChart = null;
 
+        // Mock current date for SLA calculations to match context
         const SYSTEM_TODAY = new Date(2026, 8, 3).getTime(); 
 
         Chart.register(ChartDataLabels);
@@ -535,20 +548,17 @@
                         typeOfAccident: getRowValue(row, ['Type of accident']),
                         severity: getRowValue(row, ['Incident Severity Level', 'Severity']) || 'Medium',
                         liability: getRowValue(row, ['Liability']),
-                        subContractName: getRowValue(row, ['Sub contract name', 'Subcontractor']),
+                        subContractName: getRowValue(row, ['Sub contract name', 'Subcontractor', 'Subcontract']),
                         note: getRowValue(row, ['Note', 'หมายเหตุ', 'Remark']),
                         caseDecision: getRowValue(row, ['Case Decision', 'Case decision', 'Decision']),
+                        followUpDate: getRowValue(row, ['Date Follow-up', 'Date Follow up', 'Follow up']),
                         reportIssueDate: getRowValue(row, ['Report issue date']),
                         injury: getRowValue(row, ['injury', 'Injury']),
                         damage: getRowValue(row, ['Damage', 'damage']),
                         classificationSecond: getRowValue(row, ['Classification  for second report ', 'Classification for second report']),
-                        firstReport: getRowValue(row, ['First Report', 'First Report ']),
-                        secondReport: getRowValue(row, ['Second Report', 'Second Report ']),
-                        thirdReport: getRowValue(row, ['Third Report ', 'Third Report']),
-                        finalReport: getRowValue(row, ['Final Report', 'Final Report ']),
                         personIncharge: getRowValue(row, ['Person Incharge', 'Person In Charge']),
                         reporter: getRowValue(row, ['Reporter']),
-                        followUpDate: getRowValue(row, ['Date Follow-up', 'Date Follow up']),
+                        
                         totalClaim: parseCurrency(getRowValue(row, ['Total claim'])),
                         claimUnderCons: parseCurrency(getRowValue(row, ['Claim under consideration'])),
                         kllIns: parseCurrency(getRowValue(row, ["KLL's insurance"])),
@@ -563,31 +573,17 @@
                         stagesList: []
                     };
                 }
-
-                // Preserve/refresh non-empty details when the same Report No. appears on multiple CSV rows
-                const detailUpdates = {
-                    reportIssueDate: ['Report issue date'],
-                    injury: ['injury', 'Injury'],
-                    damage: ['Damage', 'damage'],
-                    classificationSecond: ['Classification  for second report ', 'Classification for second report'],
-                    firstReport: ['First Report', 'First Report '],
-                    secondReport: ['Second Report', 'Second Report '],
-                    thirdReport: ['Third Report ', 'Third Report'],
-                    finalReport: ['Final Report', 'Final Report '],
-                    personIncharge: ['Person Incharge', 'Person In Charge'],
-                    reporter: ['Reporter'],
-                    followUpDate: ['Date Follow-up', 'Date Follow up'],
-                    note: ['Note', 'หมายเหตุ', 'Remark']
-                };
-                Object.entries(detailUpdates).forEach(([prop, keys]) => {
-                    const v = getRowValue(row, keys);
-                    if (v) casesMap[rNo][prop] = v;
-                });
+                
+                const cMap = casesMap[rNo];
+                cMap.firstReport = cMap.firstReport || getRowValue(row, ['First Report', 'First Report ']);
+                cMap.secondReport = cMap.secondReport || getRowValue(row, ['Second Report', 'Second Report ']);
+                cMap.thirdReport = cMap.thirdReport || getRowValue(row, ['Third Report ', 'Third Report']);
+                cMap.finalReport = cMap.finalReport || getRowValue(row, ['Final Report', 'Final Report ']);
 
                 ['First', 'Second', 'Third', 'Final'].forEach(st => {
                     let text = getRowValue(row, [st + ' Report', st + ' Report ', st]);
-                    if (text && !casesMap[rNo].stagesList.includes(st)) {
-                        casesMap[rNo].stagesList.push(st);
+                    if (text && !cMap.stagesList.includes(st)) {
+                        cMap.stagesList.push(st);
                     }
                 });
             });
@@ -633,12 +629,7 @@
         }
 
         function escapeHtml(value) {
-            return String(value ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
+            return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
         }
 
         const FILTER_CONFIG = {
@@ -842,7 +833,7 @@
             const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
             let displayLabels = labels.map(l => {
                 let parts = l.split('-');
-                if (parts.length === 2) return `${monthNames[parseInt(parts[1])-1]}-${parts[0].slice(-2)}`;
+                if (parts.length === 2) return `${monthNames[parseInt(parts[1])-1]}'${parts[0].slice(-2)}`;
                 return l;
             });
 
@@ -937,15 +928,6 @@
                 data: { labels: Object.keys(secMap), datasets: [{ data: Object.values(secMap), backgroundColor: [...pal].reverse() }] },
                 options: commonOptions
             });
-        }
-
-        function escapeHtml(value) {
-            return String(value ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
         }
 
         function detailValue(value) {
@@ -1061,14 +1043,22 @@
             const tb = document.getElementById('casesTableBody');
             tb.innerHTML = '';
             let tot = filteredCases.length;
-            if (tot === 0) { tb.innerHTML = `<tr><td colspan="13" class="text-center py-6 text-slate-400">No records found.</td></tr>`; return; }
+            if (tot === 0) { tb.innerHTML = `<tr><td colspan="15" class="text-center py-6 text-slate-400">No records found.</td></tr>`; return; }
 
             let start = (currentPage - 1) * itemsPerPage;
             let paged = filteredCases.slice(start, start + itemsPerPage);
 
             paged.forEach(c => {
                 let tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+                
+                // Add class for faded effect if case is Final
+                let rowClass = "border-b border-slate-100 transition";
+                if (c.isFinal) {
+                    rowClass += " final-row";
+                } else {
+                    rowClass += " hover:bg-slate-50";
+                }
+                tr.className = rowClass;
 
                 let slaBadge = `<span class="text-slate-400">-</span>`;
                 if (c.qbReceivedDate) {
@@ -1090,9 +1080,14 @@
                 let profColor = c.profit >= 0 ? 'text-emerald-800' : 'text-rose-700';
                 let profH = c.profit !== 0 ? `<div class="font-black ${profColor}">Pft: ฿${formatNumber(c.profit)}</div>` : '';
 
+                // ตัดแบ่งวันที่ Follow Up และเคาะบรรทัดอัตโนมัติ
+                let formattedFollowUp = (c.followUpDate || '-').split(/[,;\n]+/).map(d => d.trim()).filter(d => d).join('<br/>');
+                if(!formattedFollowUp) formattedFollowUp = '-';
+
                 tr.innerHTML = `
                     <td class="py-2.5 px-2 font-bold text-slate-800 whitespace-nowrap">${c.reportNo}</td>
                     <td class="py-2.5 px-2"><div class="line-clamp-2 w-28 font-medium" title="${c.customerName}">${c.customerName || '-'}</div></td>
+                    <td class="py-2.5 px-2"><div class="line-clamp-2 min-w-[120px] max-w-[180px] text-slate-500 text-[9px] break-words" title="${c.note}">${c.note || '-'}</div></td>
                     <td class="py-2.5 px-2 bg-rose-50/50 border-l border-rose-100">${claimH}${fineH}</td>
                     <td class="py-2.5 px-2 bg-emerald-50/50 border-r border-emerald-100">${revH}${profH}</td>
                     <td class="py-2.5 px-2 font-black text-slate-700 bg-slate-100/50 whitespace-nowrap">${c.qbReceivedDate || '-'}</td>
@@ -1101,8 +1096,9 @@
                     <td class="py-2.5 px-2"><span class="px-1.5 py-0.5 rounded bg-slate-200 text-slate-800 text-[9px] font-bold">${c.caseDecision || '-'}</span></td>
                     <td class="py-2.5 px-2">${c.section || '-'}</td>
                     <td class="py-2.5 px-2"><div class="line-clamp-2 w-20">${c.typeOfAccident || '-'}</div></td>
+                    <td class="py-2.5 px-2"><div class="line-clamp-2 w-24 text-[9px]" title="${c.subContractName}">${c.subContractName || '-'}</div></td>
                     <td class="py-2.5 px-2 font-bold ${c.severity==='High'?'text-rose-600':''}">${c.severity}</td>
-                    <td class="py-2.5 px-2"><div class="line-clamp-2 min-w-[120px] max-w-[200px] text-slate-500 text-[9px] break-words">${c.note || '-'}</div></td>
+                    <td class="py-2.5 px-2 text-[9px] leading-relaxed min-w-[70px] text-slate-500">${formattedFollowUp}</td>
                     <td class="py-2.5 px-2 text-center whitespace-nowrap">
                         <button type="button" onclick='openCaseView(${JSON.stringify(c.reportNo)})' class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white hover:bg-rose-600 transition text-[10px] font-bold shadow-sm">
                             <i data-lucide="eye" class="w-3.5 h-3.5"></i><span>View</span>
