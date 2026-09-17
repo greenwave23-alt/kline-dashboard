@@ -298,25 +298,22 @@
 
             <!-- Wider table to allow horizontal scrolling for all the columns requested -->
             <div class="overflow-x-auto custom-scrollbar">
-                <table class="w-full text-left border-collapse table-auto min-w-[1500px]">
+                <table class="w-full text-left border-collapse table-auto min-w-[1250px]">
                     <thead>
                         <tr class="bg-slate-50 border-b border-slate-100 text-slate-500 text-[9px] uppercase tracking-wider font-extrabold">
-                            <th class="py-2.5 px-2">Report No.</th>
-                            <th class="py-2.5 px-2">Customer</th>
-                            <!-- Note column moved here -->
-                            <th class="py-2.5 px-2 text-slate-400 font-normal w-[180px]">Note</th>
-                            <th class="py-2.5 px-2 bg-rose-50/50 text-rose-800 border-l border-rose-100">Claim / Fine</th>
-                            <th class="py-2.5 px-2 bg-emerald-50/50 text-emerald-800 border-r border-emerald-100">Job Financials</th>
+                            <th class="py-2.5 px-2 w-[70px]">Report No.</th>
+                            <th class="py-2.5 px-2 w-[90px]">Customer</th>
+                            <th class="py-2.5 px-2 text-slate-400 font-normal w-[150px]">Note</th>
+                            <th class="py-2.5 px-2">Severity</th>
+                            <th class="py-2.5 px-2 bg-rose-50/50 text-rose-800 border-l border-rose-100 w-[80px]">Claim / Fine</th>
+                            <th class="py-2.5 px-2 bg-emerald-50/50 text-emerald-800 border-r border-emerald-100 w-[80px]">Job Financials</th>
                             <th class="py-2.5 px-2 text-slate-800 bg-slate-100/50">1st QB Date</th>
                             <th class="py-2.5 px-2">Status</th>
                             <th class="py-2.5 px-2 text-center">SLA Compliance</th>
                             <th class="py-2.5 px-2">Decision</th>
                             <th class="py-2.5 px-2">Section</th>
                             <th class="py-2.5 px-2">Type</th>
-                            <!-- Subcontractor column added here -->
                             <th class="py-2.5 px-2">Subcontractor</th>
-                            <th class="py-2.5 px-2">Severity</th>
-                            <!-- Follow Up column moved here -->
                             <th class="py-2.5 px-2">Follow Up</th>
                             <th class="py-2.5 px-2 text-center">View</th>
                         </tr>
@@ -1074,30 +1071,30 @@
                 }
 
                 let stCls = c.isFinal ? 'bg-slate-700 text-white' : (c.isStage2Or3 ? 'bg-slate-200 text-slate-800' : 'bg-rose-100 text-rose-800');
-                let claimH = c.totalClaim > 0 ? `<div class="font-bold text-rose-700">Claim: ฿${formatNumber(c.totalClaim)}</div>` : '';
-                let fineH = c.fineKll > 0 ? `<div class="font-bold text-rose-900">Fine: ฿${formatNumber(c.fineKll)}</div>` : '';
-                let revH = c.rev > 0 ? `<div class="font-bold text-emerald-700">Rev: ฿${formatNumber(c.rev)}</div>` : '';
+                let claimH = c.totalClaim > 0 ? `<div class="font-bold text-rose-700 whitespace-nowrap text-[9px]">Claim: ฿${formatNumber(c.totalClaim)}</div>` : '';
+                let fineH = c.fineKll > 0 ? `<div class="font-bold text-rose-900 whitespace-nowrap text-[9px]">Fine: ฿${formatNumber(c.fineKll)}</div>` : '';
+                let revH = c.rev > 0 ? `<div class="font-bold text-emerald-700 whitespace-nowrap text-[9px]">Rev: ฿${formatNumber(c.rev)}</div>` : '';
                 let profColor = c.profit >= 0 ? 'text-emerald-800' : 'text-rose-700';
-                let profH = c.profit !== 0 ? `<div class="font-black ${profColor}">Pft: ฿${formatNumber(c.profit)}</div>` : '';
+                let profH = c.profit !== 0 ? `<div class="font-black ${profColor} whitespace-nowrap text-[9px]">Pft: ฿${formatNumber(c.profit)}</div>` : '';
 
                 // ตัดแบ่งวันที่ Follow Up และเคาะบรรทัดอัตโนมัติ
                 let formattedFollowUp = (c.followUpDate || '-').split(/[,;\n]+/).map(d => d.trim()).filter(d => d).join('<br/>');
                 if(!formattedFollowUp) formattedFollowUp = '-';
 
                 tr.innerHTML = `
-                    <td class="py-2.5 px-2 font-bold text-slate-800 whitespace-nowrap">${c.reportNo}</td>
-                    <td class="py-2.5 px-2"><div class="line-clamp-2 w-28 font-medium" title="${c.customerName}">${c.customerName || '-'}</div></td>
-                    <td class="py-2.5 px-2"><div class="line-clamp-2 min-w-[120px] max-w-[180px] text-slate-500 text-[9px] break-words" title="${c.note}">${c.note || '-'}</div></td>
-                    <td class="py-2.5 px-2 bg-rose-50/50 border-l border-rose-100">${claimH}${fineH}</td>
-                    <td class="py-2.5 px-2 bg-emerald-50/50 border-r border-emerald-100">${revH}${profH}</td>
+                    <td class="py-2.5 px-2 font-bold text-slate-800 whitespace-nowrap text-[9px] w-[70px]">${c.reportNo}</td>
+                    <td class="py-2.5 px-2 w-[90px]"><div class="line-clamp-2 font-medium leading-tight text-[9px]" title="${c.customerName}">${c.customerName || '-'}</div></td>
+                    <td class="py-2.5 px-2 w-[150px]"><div class="line-clamp-2 text-slate-500 text-[9px] break-words leading-tight" title="${c.note}">${c.note || '-'}</div></td>
+                    <td class="py-2.5 px-2 font-bold ${c.severity==='High'?'text-rose-600':''} text-[9px]">${c.severity}</td>
+                    <td class="py-2.5 px-2 bg-rose-50/50 border-l border-rose-100 w-[80px]">${claimH}${fineH}</td>
+                    <td class="py-2.5 px-2 bg-emerald-50/50 border-r border-emerald-100 w-[80px]">${revH}${profH}</td>
                     <td class="py-2.5 px-2 font-black text-slate-700 bg-slate-100/50 whitespace-nowrap">${c.qbReceivedDate || '-'}</td>
                     <td class="py-2.5 px-2"><span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase ${stCls}">${c.latestStatus}</span></td>
                     <td class="py-2.5 px-2 text-center whitespace-nowrap">${slaBadge}</td>
                     <td class="py-2.5 px-2"><span class="px-1.5 py-0.5 rounded bg-slate-200 text-slate-800 text-[9px] font-bold">${c.caseDecision || '-'}</span></td>
                     <td class="py-2.5 px-2">${c.section || '-'}</td>
-                    <td class="py-2.5 px-2"><div class="line-clamp-2 w-20">${c.typeOfAccident || '-'}</div></td>
-                    <td class="py-2.5 px-2"><div class="line-clamp-2 w-24 text-[9px]" title="${c.subContractName}">${c.subContractName || '-'}</div></td>
-                    <td class="py-2.5 px-2 font-bold ${c.severity==='High'?'text-rose-600':''}">${c.severity}</td>
+                    <td class="py-2.5 px-2"><div class="line-clamp-2 w-16">${c.typeOfAccident || '-'}</div></td>
+                    <td class="py-2.5 px-2"><div class="line-clamp-2 w-20 text-[9px]" title="${c.subContractName}">${c.subContractName || '-'}</div></td>
                     <td class="py-2.5 px-2 text-[9px] leading-relaxed min-w-[70px] text-slate-500">${formattedFollowUp}</td>
                     <td class="py-2.5 px-2 text-center whitespace-nowrap">
                         <button type="button" onclick='openCaseView(${JSON.stringify(c.reportNo)})' class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white hover:bg-rose-600 transition text-[10px] font-bold shadow-sm">
