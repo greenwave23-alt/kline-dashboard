@@ -109,7 +109,8 @@
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-3">
                 <div class="bg-rose-50/80 p-1.5 rounded-lg border border-rose-200/60">
                     <label class="block text-[10px] font-bold text-rose-800 uppercase flex items-center"><i data-lucide="target" class="w-3 h-3 mr-1"></i> Case Decision</label>
-                    <select id="filterCaseDecision" class="w-full text-[11px] bg-white rounded border-rose-300 text-rose-900 p-1.5 font-bold focus:ring-1 focus:ring-rose-500"></select>
+                    <select id="filterCaseDecision" multiple class="hidden" aria-label="Case Decision selected values"></select>
+                    <details class="relative"><summary id="caseDecisionSummary" class="cursor-pointer text-[11px] bg-white rounded border border-rose-300 p-1.5 font-bold">All (ทั้งหมด)</summary><div class="absolute z-40 left-0 top-full mt-1 w-64 rounded-lg bg-white border border-rose-200 shadow-xl p-2"><button type="button" onclick="clearCaseDecisions()" class="text-xs text-rose-700 font-bold px-2 py-1">All / Clear selection</button><div id="caseDecisionChoices" class="max-h-60 overflow-y-auto"></div><p class="text-[10px] text-slate-500 px-2 py-1">เลือกได้หลายค่า / Select multiple values</p></div></details>
                 </div>
                 <div class="bg-slate-50/80 p-1.5 rounded-lg border border-slate-200/60">
                     <label class="block text-[10px] font-bold text-slate-600 uppercase">Subcontractor</label>
@@ -140,7 +141,8 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3 border-t border-slate-100/60 pt-3">
                 <div class="bg-slate-100 p-1.5 rounded-lg border border-slate-200">
                     <label class="block text-[10px] font-bold text-slate-600 uppercase flex items-center"><i data-lucide="calendar" class="w-3 h-3 mr-1"></i> Year (Occurrence Date)</label>
-                    <select id="filterYear" class="w-full text-[11px] bg-white rounded border-slate-300 text-slate-900 p-1.5 font-bold focus:ring-1 focus:ring-rose-500"></select>
+                    <select id="filterYear" multiple class="hidden" aria-label="Selected occurrence years"></select>
+                    <details class="relative"><summary id="yearFilterSummary" class="cursor-pointer text-[11px] bg-white rounded border border-slate-300 p-1.5 font-bold">All years (ทุกปี)</summary><div class="absolute z-40 left-0 top-full mt-1 w-56 rounded-lg bg-white border border-slate-200 shadow-xl p-2"><button type="button" onclick="clearYearSelections()" class="text-xs text-rose-700 font-bold px-2 py-1">All years / Clear selection</button><div id="yearFilterChoices" class="max-h-60 overflow-y-auto"></div><p class="text-[10px] text-slate-500 px-2 py-1">เลือกได้หลายปี / Select multiple years</p></div></details>
                 </div>
                 <div class="bg-slate-100 p-1.5 rounded-lg border border-slate-200">
                     <label class="block text-[10px] font-bold text-slate-600 uppercase flex items-center"><i data-lucide="calendar-days" class="w-3 h-3 mr-1"></i> Month Basis</label>
@@ -660,6 +662,32 @@
             filterYear: c => extractYear(c.dateOfOccurrence)
         };
 
+        function renderYearChoices() {
+            const select=document.getElementById('filterYear'),choices=document.getElementById('yearFilterChoices');choices.innerHTML='';
+            Array.from(select.options).forEach(option=>{
+                const label=document.createElement('label');label.className='flex items-center gap-2 px-2 py-2 text-sm cursor-pointer hover:bg-slate-50';
+                const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.checked=option.selected;
+                checkbox.addEventListener('change',()=>{option.selected=checkbox.checked;select.dispatchEvent(new Event('change'));});
+                const text=document.createElement('span');text.textContent=option.text;label.append(checkbox,text);choices.appendChild(label);
+            });
+            const values=Array.from(select.selectedOptions).map(o=>o.text);document.getElementById('yearFilterSummary').textContent=values.length?values.join(', '):'All years (ทุกปี)';
+        }
+        function clearYearSelections(){Array.from(document.getElementById('filterYear').options).forEach(o=>o.selected=false);currentPage=1;applyFiltersAndRender();}
+        function renderCaseDecisionChoices() {
+            const select = document.getElementById('filterCaseDecision');
+            const choices = document.getElementById('caseDecisionChoices');
+            choices.innerHTML = '';
+            Array.from(select.options).forEach(option=>{
+                const label=document.createElement('label');label.className='flex items-center gap-2 px-2 py-2 text-sm cursor-pointer hover:bg-rose-50';
+                const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.checked=option.selected;
+                checkbox.addEventListener('change',()=>{option.selected=checkbox.checked;select.dispatchEvent(new Event('change'));});
+                const text=document.createElement('span');text.textContent=option.text;
+                label.append(checkbox,text);choices.appendChild(label);
+            });
+            const selected=Array.from(select.selectedOptions).map(o=>o.text);
+            document.getElementById('caseDecisionSummary').textContent=selected.length?selected.join(', '):'All (ทั้งหมด)';
+        }
+        function clearCaseDecisions(){const select=document.getElementById('filterCaseDecision');Array.from(select.options).forEach(o=>o.selected=false);currentPage=1;applyFiltersAndRender();}
         function populateFilterDropdowns() { refreshLinkedFilterOptions(true); }
 
         function refreshLinkedFilterOptions(isInitial = false) {
@@ -667,11 +695,20 @@
                 const el = document.getElementById(id);
                 if (!el) return;
                 const currentVal = el.value;
+                const selectedValues = ['filterCaseDecision','filterYear'].includes(id) ? Array.from(el.selectedOptions).map(o=>o.value) : [];
                 const available = consolidatedCases
-                    .filter(c => matchesFilter(c, false, id))
+                    .filter(c => id === 'filterYear' || matchesFilter(c, false, id))
                     .map(c => String(getter(c) || '').trim())
                     .filter(Boolean);
                 const values = Array.from(new Set(available)).sort((a,b) => a.localeCompare(b, undefined, {numeric:true, sensitivity:'base'}));
+                if (['filterCaseDecision','filterYear'].includes(id)) {
+                    if (id === 'filterYear') values.sort((a,b)=>Number(b)-Number(a));
+                    selectedValues.forEach(v=>{if(!values.includes(v))values.unshift(v)});
+                    el.innerHTML = values.map(v=>`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
+                    Array.from(el.options).forEach(o=>o.selected=selectedValues.includes(o.value));
+                    if (id === 'filterYear') renderYearChoices(); else renderCaseDecisionChoices();
+                    return;
+                }
                 if (currentVal && !values.includes(currentVal)) values.unshift(currentVal);
                 el.innerHTML = '<option value="">All (ทั้งหมด)</option>' + values.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
                 if (currentVal) el.value = currentVal;
@@ -686,8 +723,8 @@
             };
 
             const norm = v => String(v || '').trim().toLowerCase();
-            const fDec = getVal('filterCaseDecision');
-            if (ignoreFilterId !== 'filterCaseDecision' && fDec && norm(c.caseDecision) !== norm(fDec)) return false;
+            const fDec = Array.from(document.getElementById('filterCaseDecision')?.selectedOptions || []).map(o=>norm(o.value));
+            if (ignoreFilterId !== 'filterCaseDecision' && fDec.length && !fDec.includes(norm(c.caseDecision))) return false;
 
             const fSub = getVal('filterSubcontractor');
             if (ignoreFilterId !== 'filterSubcontractor' && fSub && norm(c.subContractName) !== norm(fSub)) return false;
@@ -707,8 +744,8 @@
             const fLia = getVal('filterLiability');
             if (ignoreFilterId !== 'filterLiability' && fLia && norm(c.liability) !== norm(fLia)) return false;
 
-            const fYear = getVal('filterYear');
-            if (ignoreFilterId !== 'filterYear' && fYear && extractYear(c.dateOfOccurrence) !== fYear) return false;
+            const fYears = Array.from(document.getElementById('filterYear')?.selectedOptions || []).map(o=>o.value);
+            if (ignoreFilterId !== 'filterYear' && fYears.length && !fYears.includes(extractYear(c.dateOfOccurrence))) return false;
 
             if (selectedStatusFilter) {
                 if (selectedStatusFilter === 'active' && c.isFinal) return false;
@@ -965,15 +1002,30 @@
             if(months.includes(current))select.value=current;
             renderExecutiveReport();
         }
+        function isWaiting(c){return /^(waiting|wating|pending|รอสรุป|รอพิจารณา)$/i.test(String(c.caseDecision||'').trim());}
+        function shiftReportMonth(month,offset){const [y,m]=month.split('-').map(Number);const d=new Date(y,m-1+offset,1);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
+        function executiveTrendSvg(month,basis){
+            if(!month)return '';
+            const months=Array.from({length:6},(_,i)=>shiftReportMonth(month,i-5));
+            const data=months.map(m=>{const rows=consolidatedCases.filter(c=>getYearMonth(c[basis])===m);return [rows.length,rows.filter(isAtFault).length,rows.filter(isWaiting).length]});
+            const max=Math.max(1,...data.flat()),colors=['#64748b','#e11d48','#d97706'];
+            const marks=data.map((values,i)=>{const x=55+i*97;return values.map((n,j)=>{const height=n/max*112;return `<rect x="${x+j*21}" y="${148-height}" width="17" height="${height}" fill="${colors[j]}"/><text x="${x+j*21+8}" y="${142-height}" text-anchor="middle" font-size="10">${n}</text>`}).join('')+`<text x="${x+28}" y="167" text-anchor="middle" font-size="11">${months[i]}</text>`}).join('');
+            return `<svg viewBox="0 0 680 200" role="img" aria-label="Six-month case count trend" style="width:100%;max-height:200px;break-inside:avoid"><line x1="42" y1="148" x2="665" y2="148" stroke="#cbd5e1"/>${marks}<rect x="75" y="184" width="10" height="10" fill="#64748b"/><text x="90" y="193" font-size="11">All cases</text><rect x="265" y="184" width="10" height="10" fill="#e11d48"/><text x="280" y="193" font-size="11">At-fault (subset)</text><rect x="465" y="184" width="10" height="10" fill="#d97706"/><text x="480" y="193" font-size="11">Waiting (subset)</text></svg>`;
+        }
+        function executiveCaseTable(rows){
+            const details=rows.map(c=>{const text=String(c.overview||c.firstReport||c.note||'-');const summary=text.length>350?text.slice(0,350)+'…':text;const sla=c.isFinal?'Closed':c.isStage2Or3?'On process':c.slaStatus==='overdue'?`Overdue ${c.slaOverdueDays}d`:'Within SLA';return `<tr><td>${escapeHtml(c.reportNo)}</td><td>${escapeHtml(c.dateOfOccurrence||'-')}<br><small>QB: ${escapeHtml(c.qbReceivedDate||'-')}</small></td><td>${escapeHtml(c.customerName||'-')}<br><small>${escapeHtml(c.section||'-')}</small></td><td>${escapeHtml(c.severity||'-')}<br>${escapeHtml(c.latestStatus)}<br>${escapeHtml(sla)}</td><td>${moneyValue(c.totalClaim)}</td><td>${escapeHtml(summary)}<br><small>PIC: ${escapeHtml(c.personIncharge||'-')}<br>Follow Up: ${escapeHtml(c.followUpDate||'-')}</small></td></tr>`}).join('');
+            return `<table><colgroup><col style="width:14%"><col style="width:13%"><col style="width:18%"><col style="width:13%"><col style="width:12%"><col style="width:30%"></colgroup><thead><tr><th>Report No.</th><th>Occurrence / QB date</th><th>Customer / Section</th><th>Severity / Status / SLA</th><th>Claim (THB)</th><th>Overview / Follow-up</th></tr></thead><tbody>${details||'<tr><td colspan="6">No cases in this category.</td></tr>'}</tbody></table>`;
+        }
         function executiveReportHtml() {
             const month=document.getElementById('execMonth').value,basis=document.getElementById('execBasis').value;
-            const monthly=consolidatedCases.filter(c=>getYearMonth(c[basis])===month),cases=monthly.filter(isAtFault);
-            const total=cases.length,closed=cases.filter(c=>c.isFinal).length,high=cases.filter(c=>/high/i.test(c.severity)).length,overdue=cases.filter(c=>c.slaStatus==='overdue').length;
-            const sum=key=>cases.reduce((a,c)=>a+(Number(c[key])||0),0);
-            const sections={};cases.forEach(c=>{const key=c.section||'Unknown';sections[key]=(sections[key]||0)+1});
-            const details=cases.map(c=>{const overview=String(c.overview||c.firstReport||c.note||'-');const summary=overview.length>350?overview.slice(0,350)+'…':overview;const sla=c.isFinal?'Closed':c.isStage2Or3?'On process':c.slaStatus==='overdue'?`Overdue ${c.slaOverdueDays}d`:'Within SLA';return `<tr><td>${escapeHtml(c.reportNo)}</td><td>${escapeHtml(c[basis]||'-')}</td><td>${escapeHtml(c.customerName||'-')}<br><small>${escapeHtml(c.section||'-')}</small></td><td>${escapeHtml(c.severity||'-')}</td><td>${escapeHtml(c.latestStatus)}<br>${escapeHtml(sla)}</td><td>${moneyValue(c.totalClaim)}</td><td>${escapeHtml(summary)}</td></tr>`}).join('');
-            const date=new Date().toLocaleString('en-GB',{timeZone:'Asia/Bangkok'});
-            return `<style>${EXEC_REPORT_CSS}</style><article class="exec-report"><h1>BPI — Executive Monthly Report</h1><p><b>K Line Logistics (Thailand) Ltd. | ${escapeHtml(month||'No dated records')}</b></p><p class="meta">Scope: At-fault cases (Case Decision: Offensive / At-Fault) only. Month basis: ${basis==='qbReceivedDate'?'QB received date':'Date of occurrence'}.</p><p class="meta">Source: uploaded CSV, independent of dashboard filters. Prepared: ${escapeHtml(date)} (Thailand).</p><table class="metrics"><tr><td>At-fault cases<b>${total}</b></td><td>Open<b>${total-closed}</b></td><td>Closed<b>${closed}</b></td><td>High severity<b>${high}</b></td><td>Awaiting Second, overdue<b>${overdue}</b></td></tr></table><p class="meta">${monthly.length} cases dated in this month; ${total} classified as at-fault. ${consolidatedCases.filter(c=>!getYearMonth(c[basis])).length} records have no valid date for this basis and are excluded.</p><h2>Financial exposure — THB</h2><table><thead><tr><th>Total claim</th><th>Claim under consideration</th><th>Fine by KLL</th><th>Fine by customer</th></tr></thead><tbody><tr><td>${moneyValue(sum('totalClaim'))}</td><td>${moneyValue(sum('claimUnderCons'))}</td><td>${moneyValue(sum('fineKll'))}</td><td>${moneyValue(sum('fineCust'))}</td></tr></tbody></table><p class="meta">Amounts are shown separately as recorded in CSV; claim and pending claim are not added together.</p><h2>Cases by section</h2><table><thead><tr><th>Section</th><th>At-fault cases</th></tr></thead><tbody>${Object.entries(sections).sort((a,b)=>b[1]-a[1]).map(([k,n])=>`<tr><td>${escapeHtml(k)}</td><td>${n}</td></tr>`).join('')||'<tr><td colspan="2">No at-fault cases in this month.</td></tr>'}</tbody></table><h2>Monthly case register</h2><table><colgroup><col style="width:14%"><col style="width:9%"><col style="width:17%"><col style="width:8%"><col style="width:12%"><col style="width:12%"><col style="width:28%"></colgroup><thead><tr><th>Report No.</th><th>Date</th><th>Customer / Section</th><th>Severity</th><th>Status / SLA</th><th>Claim (THB)</th><th>Overview / Incident summary</th></tr></thead><tbody>${details||'<tr><td colspan="7">No at-fault cases in this month.</td></tr>'}</tbody></table><p class="meta">Summaries are limited to 350 characters. Full details are available in each case’s View menu.</p></article>`;
+            const monthly=consolidatedCases.filter(c=>month&&getYearMonth(c[basis])===month),priorMonth=month?shiftReportMonth(month,-1):'',prior=consolidatedCases.filter(c=>priorMonth&&getYearMonth(c[basis])===priorMonth);
+            const fault=monthly.filter(isAtFault),waiting=monthly.filter(isWaiting),high=monthly.filter(c=>/high/i.test(c.severity)).length;
+            const sum=(rows,key)=>rows.reduce((n,c)=>n+(Number(c[key])||0),0);
+            const categories={};monthly.forEach(c=>{const label=String(c.caseDecision||'Unclassified').trim()||'Unclassified';categories[label]=(categories[label]||0)+1});
+            const metrics=[['All cases',monthly.length,prior.length],['At-fault cases',fault.length,prior.filter(isAtFault).length],['Waiting cases',waiting.length,prior.filter(isWaiting).length],['High severity (all cases)',high,prior.filter(c=>/high/i.test(c.severity)).length],['At-fault claim (THB)',sum(fault,'totalClaim'),sum(prior.filter(isAtFault),'totalClaim')]];
+            const comparison=metrics.map(([label,current,previous])=>`<tr><td>${label}</td><td>${formatNumber(current)}</td><td>${formatNumber(previous)}</td><td>${current-previous>0?'+':''}${formatNumber(current-previous)}</td><td>${previous?`${((current-previous)/previous*100).toFixed(1)}%`:'N/A (prior = 0)'}</td></tr>`).join('');
+            const sections={};monthly.forEach(c=>{const k=c.section||'Unknown';if(!sections[k])sections[k]=[0,0,0];sections[k][0]++;if(isAtFault(c))sections[k][1]++;if(isWaiting(c))sections[k][2]++});
+            return `<style>${EXEC_REPORT_CSS}</style><article class="exec-report"><h1>BPI — Executive Monthly Report</h1><p><b>K Line Logistics (Thailand) Ltd. | ${escapeHtml(month||'No dated records')}</b></p><p class="meta">Month basis: ${basis==='qbReceivedDate'?'QB received date (reports received)':'Date of occurrence (incidents occurring)'}. Source: uploaded CSV; independent of dashboard filters.</p><h2>1. Executive overview — all cases in this month</h2><table class="metrics"><tr><td>All cases<b>${monthly.length}</b></td><td>At-fault - BPI<b>${fault.length}</b></td><td>Waiting<b>${waiting.length}</b></td><td>High severity<b>${high}</b></td><td>Open / Closed<b>${monthly.filter(c=>!c.isFinal).length} / ${monthly.filter(c=>c.isFinal).length}</b></td></tr></table><p class="meta">Waiting means responsibility is not yet confirmed; these cases are not included in at-fault financial totals. Classification and status reflect the current CSV, not historical month-end snapshots.</p><h2>2. Case Decision statistics — all categories</h2><table><thead><tr><th>Case Decision</th><th>Cases</th><th>Share of monthly cases</th></tr></thead><tbody>${Object.entries(categories).sort((a,b)=>b[1]-a[1]).map(([label,n])=>`<tr><td>${escapeHtml(label)}</td><td>${n}</td><td>${monthly.length?(n/monthly.length*100).toFixed(1):0}%</td></tr>`).join('')||'<tr><td colspan="3">No cases.</td></tr>'}</tbody></table><h2>3. Cases by section</h2><table><thead><tr><th>Section</th><th>All cases</th><th>At-fault - BPI</th><th>Waiting</th></tr></thead><tbody>${Object.entries(sections).sort((a,b)=>b[1][0]-a[1][0]).map(([label,n])=>`<tr><td>${escapeHtml(label)}</td><td>${n[0]}</td><td>${n[1]}</td><td>${n[2]}</td></tr>`).join('')||'<tr><td colspan="4">No cases.</td></tr>'}</tbody></table><h2>4. At-fault - BPI financial exposure — THB</h2><table><thead><tr><th>Total claim</th><th>Claim under consideration</th><th>Fine by KLL</th><th>Fine by customer</th></tr></thead><tbody><tr><td>${moneyValue(sum(fault,'totalClaim'))}</td><td>${moneyValue(sum(fault,'claimUnderCons'))}</td><td>${moneyValue(sum(fault,'fineKll'))}</td><td>${moneyValue(sum(fault,'fineCust'))}</td></tr></tbody></table><p class="meta">Amounts are shown separately; claim and pending claim are not added together.</p><h2>5. At-fault - BPI case register</h2>${executiveCaseTable(fault)}<h2 style="border-left:4px solid #d97706;padding-left:6px">6. Waiting — responsibility pending / เคสรอสรุปความรับผิด</h2><p class="meta">Management follow-up: confirm responsibility, assign/confirm PIC, and update the case outcome.</p>${executiveCaseTable(waiting)}<p class="meta">Summaries limited to 350 characters; full details in View. Records without a valid date for the selected basis: ${consolidatedCases.filter(c=>!getYearMonth(c[basis])).length}. Prepared: ${escapeHtml(new Date().toLocaleString('en-GB',{timeZone:'Asia/Bangkok'}))} (Thailand).</p></article>`;
         }
         function renderExecutiveReport(){document.getElementById('executiveReportContent').innerHTML=executiveReportHtml();}
         function printExecutiveReport(){
